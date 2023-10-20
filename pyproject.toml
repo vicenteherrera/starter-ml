@@ -10,9 +10,17 @@ python = "^3.11"
 transformers = "^4.34.0"
 jupyterlab = "^4.0.7"
 matplotlib = "^3.8.0"
-torch = "^2.1.0"
 ipywidgets = "^8.1.1"
+torch = [
+  {version = "^2.1.0", platform = "darwin"},
+  {version = "^2.1.0+cu118", platform = "windows", source = "torch-cuda11.8"},
+  {version = "^2.1.0+cu118", platform = "linux", source = "torch-cuda11.8"}
+]
 
+[[tool.poetry.source]]
+name = "torch-cuda11.8"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "supplemental"
 
 [build-system]
 requires = ["poetry-core"]
