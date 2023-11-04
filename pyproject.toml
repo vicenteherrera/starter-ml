@@ -23,5 +23,5 @@ url = "https://download.pytorch.org/whl/cu118"
 priority = "supplemental"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.6.1"]
 build-backend = "poetry.core.masonry.api"
