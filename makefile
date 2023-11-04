@@ -8,6 +8,9 @@ update:
 	@echo "It's ok to receive 'Authorization error accessing https://download.pytorch.org/whl/cu118/tokenizers'"
 	poetry update
 
+run_hugging_face:
+	poetry run python ./starter_ml/hugging-face.py
+
 show:
 	poetry show
 
