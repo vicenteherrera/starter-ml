@@ -4,12 +4,14 @@ all: jupyter
 jupyter:
 	poetry run jupyter-lab
 
+run:
+	poetry run python ./starter_ml/hugging-face.py
+
+# Libraries utilities ----------------------------------------
+
 update:
 	@echo "It's ok to receive 'Authorization error accessing https://download.pytorch.org/whl/cu118/tokenizers'"
 	poetry update
-
-run_hugging_face:
-	poetry run python ./starter_ml/hugging-face.py
 
 show:
 	poetry show
@@ -17,7 +19,7 @@ show:
 info:
 	poetry run poetry env info -p
 
-cleanup:
+delete:
 	poetry env remove python
 	rm -r $$HOME/.cache/huggingface/
 

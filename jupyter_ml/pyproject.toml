@@ -16,6 +16,7 @@ torch = [
   {version = "^2.1.0+cu118", platform = "windows", source = "torch-cuda11.8"},
   {version = "^2.1.0+cu118", platform = "linux", source = "torch-cuda11.8"}
 ]
+python-dotenv = "^1.0.0"
 
 [[tool.poetry.source]]
 name = "torch-cuda11.8"

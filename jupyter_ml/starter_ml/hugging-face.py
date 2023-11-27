@@ -1,4 +1,9 @@
+import os
+from dotenv import load_dotenv
 from transformers import pipeline
+
+if os.path.exists('./env.txt'):
+  load_dotenv('./env.txt')
 
 print("")
 print("SENTIMENT-ANALYSIS")
