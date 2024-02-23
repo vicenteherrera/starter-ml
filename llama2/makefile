@@ -1,5 +1,5 @@
 
-all: requirements install_python update download run size
+all: requirements install_python install download run size
 
 run:
 	poetry run python ./src/llama2.py
@@ -19,8 +19,10 @@ requirements:
 
 # Libraries utilities ----------------------------------------
 
+install:
+	poetry install --no-root
+
 update:
-	@echo "It's ok to receive 'Authorization error accessing https://download.pytorch.org/whl/cu118/tokenizers'"
 	poetry update
 
 show:

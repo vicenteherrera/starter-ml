@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "starter-ml"
+name = "local_model"
 version = "0.1.0"
 description = ""
 authors = ["Vicente Herrera <vicenteherrera@vicenteherrera.com>"]
@@ -8,20 +8,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 transformers = "^4.34.0"
-torch = [
-  {version = "^2.1.0", platform = "darwin"},
-  {version = "^2.1.0+cu118", platform = "windows", source = "torch-cuda11.8"},
-  {version = "^2.1.0+cu118", platform = "linux", source = "torch-cuda11.8"}
-]
+torch = "^2.1.1"
 python-dotenv = "^1.0.0"
 outlines = "^0.0.9"
 accelerate = "^0.24.1"
-
-[[tool.poetry.source]]
-name = "torch-cuda11.8"
-url = "https://download.pytorch.org/whl/cu118"
-priority = "supplemental"
-
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"

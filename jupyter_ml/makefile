@@ -1,5 +1,5 @@
 
-all: jupyter
+all: requirements install_python install jupyter
 
 jupyter:
 	poetry run jupyter-lab
@@ -7,10 +7,19 @@ jupyter:
 run:
 	poetry run python ./starter_ml/hugging-face.py
 
+install_python:
+	pyenv install $$(cat .python-version) -s
+
+requirements:
+	which pyenv
+	which poetry
+
 # Libraries utilities ----------------------------------------
 
+install:
+	poetry install --no-root
+
 update:
-	@echo "It's ok to receive 'Authorization error accessing https://download.pytorch.org/whl/cu118/tokenizers'"
 	poetry update
 
 show:
