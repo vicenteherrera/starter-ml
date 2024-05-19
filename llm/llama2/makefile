@@ -52,9 +52,14 @@ RUNSUDO := $(shell groups | grep ' docker ' 1>/dev/null || echo "sudo")
 
 .PHONY: container-build
 # build the container image
-container-build:
+container-build-copy:
 	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f containerfile -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
+	@${RUNSUDO} docker buildx build . -f containerfile_copy -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
+
+container-build-download:
+	@echo "Building container image"
+	@${RUNSUDO} docker buildx build . -f containerfile_download -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
 
 container-run:
 	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/llama2.py
+
