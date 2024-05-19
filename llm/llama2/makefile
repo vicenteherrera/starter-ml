@@ -52,6 +52,10 @@ RUNSUDO := $(shell groups | grep ' docker ' 1>/dev/null || echo "sudo")
 
 .PHONY: container-build
 # build the container image
+
+vulnerability-scan:
+	trivy filesystem poetry.lock --scanners vuln
+
 container-build-copy:
 	@echo "Building container image"
 	@${RUNSUDO} docker buildx build . -f containerfile_copy -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
