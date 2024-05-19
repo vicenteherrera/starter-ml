@@ -28,7 +28,7 @@ RUN poetry config virtualenvs.create false \
   && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
 # Creating folders, and files for a project:
-COPY ./starter_ml /code/starter_ml
+COPY ./src /code/src
 
 
 # Copy existing huggingface cache of models and datasets

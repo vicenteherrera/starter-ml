@@ -43,7 +43,7 @@ size:
 
 # Container targets ------------------------------------------
 
-CONTAINER_IMAGE=quay.io/vicenteherrera/starter-ml
+CONTAINER_IMAGE=quay.io/vicenteherrera/llama2
 
 # Check if sudo is required to run Docker
 RUNSUDO := $(shell groups | grep ' docker ' 1>/dev/null || echo "sudo")
@@ -57,4 +57,4 @@ container-build:
 	@${RUNSUDO} docker buildx build . -f containerfile -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
 
 container-run:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./starter_ml/hugging-face.py
+	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/llama2.py
