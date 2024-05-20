@@ -9,7 +9,6 @@ print("# Executing model")
 start_time = time.time()
 config = dotenv_values('env.txt')
 model_name = "meta-llama/Llama-2-7b-chat-hf"
-# model_name = "mistralai/Mistral-7B-v0.1"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('Using device:', device)

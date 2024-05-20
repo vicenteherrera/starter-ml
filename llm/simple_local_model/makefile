@@ -2,10 +2,10 @@
 all: requirements install_python install download run size
 
 run:
-	poetry run python ./src/llama2.py
+	poetry run python ./src/app.py
 
 download:
-	poetry run python ./src/llama2-download.py
+	poetry run python ./src/model-download.py
 
 install_python:
 	pyenv install $$(cat .python-version) -s
@@ -37,7 +37,7 @@ delete:
 
 size:
 	@echo "Size of libraries"
-	@du -sh $$(poetry run poetry env info --path 2>/dev/null)
+	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of models"
 	@du -sh $$HOME/.cache/huggingface/
 
@@ -65,5 +65,7 @@ container-build-download:
 	@${RUNSUDO} docker buildx build . -f containerfile_download -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
 
 container-run:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/llama2.py
+	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/app.py
 
+container-vulnerability-scan:
+	trivy image ${CONTAINER_IMAGE} --scanners vuln
