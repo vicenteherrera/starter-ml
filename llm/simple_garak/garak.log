@@ -1447,3 +1447,80 @@ Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 2024-05-21 00:28:02,557  DEBUG  non-config params: [('probes', 'dan.AutoDANCached'), ('list_detectors', False), ('list_probes', False), ('list_generators', False), ('list_buffs', False), ('list_config', False), ('plugin_info', None), ('report', None), ('version', False)]
 2024-05-21 00:28:02,563  INFO  started at 2024-05-21T00:28:02.543155
 2024-05-21 00:28:02,564  INFO  reporting to garak_runs/garak.1498a966-ae65-4d50-82a5-1c295f8775f7.report.jsonl
+2024-05-21 02:45:09,527  INFO  invoked
+2024-05-21 02:45:09,528  DEBUG  Loading configs from: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/resources/garak.core.yaml
+2024-05-21 02:45:09,539  DEBUG  args - raw argument string received: ['--model_type', 'openai', '--model_name', 'gpt-3.5-turbo', '--probes', 'dan.AutoDANCached']
+2024-05-21 02:45:09,539  DEBUG  args - full argparse: Namespace(verbose=0, report_prefix=None, narrow_output=False, parallel_requests=False, parallel_attempts=False, seed=None, deprefix=True, eval_threshold=0.5, generations=10, config=None, model_type='openai', model_name='gpt-3.5-turbo', generator_option_file=None, generator_options=None, probes='dan.AutoDANCached', probe_option_file=None, probe_options=None, probe_tags=None, detectors='auto', extended_detectors=False, buffs=None, taxonomy=None, plugin_info=None, list_probes=False, list_detectors=False, list_generators=False, list_buffs=False, list_config=False, version=False, report=None, interactive=False, generate_autodan=False, **{'interactive.py': False})
+2024-05-21 02:45:09,540  DEBUG  no site config found at: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/garak.site.yaml
+2024-05-21 02:45:09,540  DEBUG  Loading configs from: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/resources/garak.core.yaml
+2024-05-21 02:45:09,544  DEBUG  args - cli_args&commands stored: Namespace(model_type='openai', model_name='gpt-3.5-turbo', probes='dan.AutoDANCached', verbose=0, list_detectors=False, list_probes=False, list_generators=False, list_buffs=False, list_config=False, plugin_info=None, interactive=False, report=None, version=False)
+2024-05-21 02:45:09,544  DEBUG  non-config params: [('probes', 'dan.AutoDANCached'), ('list_detectors', False), ('list_probes', False), ('list_generators', False), ('list_buffs', False), ('list_config', False), ('plugin_info', None), ('report', None), ('version', False)]
+2024-05-21 02:45:09,551  INFO  started at 2024-05-21T02:45:09.523773
+2024-05-21 02:45:09,552  INFO  reporting to garak_runs/garak.8acb1485-ce3a-4727-8204-cfde68a894ad.report.jsonl
+2024-05-21 02:45:19,294  INFO  invoked
+2024-05-21 02:45:19,295  DEBUG  Loading configs from: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/resources/garak.core.yaml
+2024-05-21 02:45:19,306  DEBUG  args - raw argument string received: ['--model_type', 'huggingface', '--model_name', 'gpt2', '--probes', 'dan.AutoDANCached']
+2024-05-21 02:45:19,306  DEBUG  args - full argparse: Namespace(verbose=0, report_prefix=None, narrow_output=False, parallel_requests=False, parallel_attempts=False, seed=None, deprefix=True, eval_threshold=0.5, generations=10, config=None, model_type='huggingface', model_name='gpt2', generator_option_file=None, generator_options=None, probes='dan.AutoDANCached', probe_option_file=None, probe_options=None, probe_tags=None, detectors='auto', extended_detectors=False, buffs=None, taxonomy=None, plugin_info=None, list_probes=False, list_detectors=False, list_generators=False, list_buffs=False, list_config=False, version=False, report=None, interactive=False, generate_autodan=False, **{'interactive.py': False})
+2024-05-21 02:45:19,307  DEBUG  no site config found at: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/garak.site.yaml
+2024-05-21 02:45:19,307  DEBUG  Loading configs from: /Users/vicenteherrera/.local/pipx/venvs/garak/lib/python3.12/site-packages/garak/resources/garak.core.yaml
+2024-05-21 02:45:19,311  DEBUG  args - cli_args&commands stored: Namespace(model_type='huggingface', model_name='gpt2', probes='dan.AutoDANCached', verbose=0, list_detectors=False, list_probes=False, list_generators=False, list_buffs=False, list_config=False, plugin_info=None, interactive=False, report=None, version=False)
+2024-05-21 02:45:19,311  DEBUG  non-config params: [('probes', 'dan.AutoDANCached'), ('list_detectors', False), ('list_probes', False), ('list_generators', False), ('list_buffs', False), ('list_config', False), ('plugin_info', None), ('report', None), ('version', False)]
+2024-05-21 02:45:19,317  INFO  started at 2024-05-21T02:45:19.292133
+2024-05-21 02:45:19,318  INFO  reporting to garak_runs/garak.332b590e-91bf-4964-a0ef-f045de2d2169.report.jsonl
+2024-05-21 02:45:22,705  INFO  generator init: <garak.generators.huggingface.Pipeline object at 0x103a4e630>
+2024-05-21 02:45:22,767  DEBUG  Using CPU, torch.cuda.is_available() returned False
+2024-05-21 02:45:22,782  DEBUG  Starting new HTTPS connection (1): huggingface.co:443
+2024-05-21 02:45:22,977  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/config.json HTTP/1.1" 200 0
+2024-05-21 02:45:22,980  DEBUG  Attempting to acquire lock 4717126976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/10c66461e4c109db5a2196bff4bb59be30396ed8.lock
+2024-05-21 02:45:22,980  DEBUG  Lock 4717126976 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/10c66461e4c109db5a2196bff4bb59be30396ed8.lock
+2024-05-21 02:45:23,115  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/config.json HTTP/1.1" 200 665
+2024-05-21 02:45:23,146  DEBUG  Attempting to release lock 4717126976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/10c66461e4c109db5a2196bff4bb59be30396ed8.lock
+2024-05-21 02:45:23,146  DEBUG  Lock 4717126976 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/10c66461e4c109db5a2196bff4bb59be30396ed8.lock
+2024-05-21 02:45:23,625  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/model.safetensors HTTP/1.1" 302 0
+2024-05-21 02:45:23,628  DEBUG  Attempting to acquire lock 4723388976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707.lock
+2024-05-21 02:45:23,629  DEBUG  Lock 4723388976 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707.lock
+2024-05-21 02:45:23,633  DEBUG  Starting new HTTPS connection (1): cdn-lfs.huggingface.co:443
+2024-05-21 02:45:23,775  DEBUG  https://cdn-lfs.huggingface.co:443 "GET /gpt2/248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707?response-content-disposition=attachment%3B+filename*%3DUTF-8%27%27model.safetensors%3B+filename%3D%22model.safetensors%22%3B&Expires=1716511523&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxNjUxMTUyM319LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLWxmcy5odWdnaW5nZmFjZS5jby9ncHQyLzI0OGRmYzM5MTE4NjllYzQ5M2M3NmU2NWJmMmZjZjdmNjE1ODI4YjAyNTRjMTJiNDczMTgyZjBmODFkM2E3MDc~cmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj0qIn1dfQ__&Signature=a~m2xA1iHU7lLqti0FBVT4dKzUu2S8FVRGkZVumQeQAP4iwOhtphTE3uAc-mdZw7pvUJyJxi4a9HJ7aGMjBPl4pCxMwPrsmOJa8dcQaz~h-EjRWVTVOMCZ3yd5H3rrfl80HAVVzrPt1TG3SY5lu8-WNHI1vqZcDZv2ingWPIpeb~Uu-qBMSrzW2OUkT1AcwaRTAL8oUgHiGCfJtQdl8-R0Lwfe~b07g3Nl5jCWcGcCoGv4J86Ov8tcf~rlOCSYzNk0ehAzUpcEQDCbsQjKQoupxoyTvs6gNtiKdktVnzkGolX0LDCAlpoXsfsNiA1KXKRPTa74215Zt1roeFs25bNw__&Key-Pair-Id=KVTP0A1DKRTAX HTTP/1.1" 200 548105171
+2024-05-21 02:45:30,970  DEBUG  Attempting to release lock 4723388976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707.lock
+2024-05-21 02:45:30,970  DEBUG  Lock 4723388976 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707.lock
+2024-05-21 02:45:31,361  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/generation_config.json HTTP/1.1" 200 0
+2024-05-21 02:45:31,362  DEBUG  Attempting to acquire lock 4723867568 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/3dc481ecc3b2c47a06ab4e20dba9d7f4b447bdf3.lock
+2024-05-21 02:45:31,363  DEBUG  Lock 4723867568 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/3dc481ecc3b2c47a06ab4e20dba9d7f4b447bdf3.lock
+2024-05-21 02:45:31,487  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/generation_config.json HTTP/1.1" 200 124
+2024-05-21 02:45:31,490  DEBUG  Attempting to release lock 4723867568 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/3dc481ecc3b2c47a06ab4e20dba9d7f4b447bdf3.lock
+2024-05-21 02:45:31,490  DEBUG  Lock 4723867568 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/3dc481ecc3b2c47a06ab4e20dba9d7f4b447bdf3.lock
+2024-05-21 02:45:31,824  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/tokenizer_config.json HTTP/1.1" 200 0
+2024-05-21 02:45:31,825  DEBUG  Attempting to acquire lock 4723388976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/be4d21d94f3b4687e5a54d84bf6ab46ed0f8defd.lock
+2024-05-21 02:45:31,826  DEBUG  Lock 4723388976 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/be4d21d94f3b4687e5a54d84bf6ab46ed0f8defd.lock
+2024-05-21 02:45:31,963  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/tokenizer_config.json HTTP/1.1" 200 26
+2024-05-21 02:45:31,966  DEBUG  Attempting to release lock 4723388976 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/be4d21d94f3b4687e5a54d84bf6ab46ed0f8defd.lock
+2024-05-21 02:45:31,966  DEBUG  Lock 4723388976 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/be4d21d94f3b4687e5a54d84bf6ab46ed0f8defd.lock
+2024-05-21 02:45:32,226  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/vocab.json HTTP/1.1" 200 0
+2024-05-21 02:45:32,227  DEBUG  Attempting to acquire lock 4722721616 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/1f1d9aaca301414e7f6c9396df506798ff4eb9a6.lock
+2024-05-21 02:45:32,228  DEBUG  Lock 4722721616 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/1f1d9aaca301414e7f6c9396df506798ff4eb9a6.lock
+2024-05-21 02:45:32,357  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/vocab.json HTTP/1.1" 200 1042301
+2024-05-21 02:45:32,761  DEBUG  Attempting to release lock 4722721616 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/1f1d9aaca301414e7f6c9396df506798ff4eb9a6.lock
+2024-05-21 02:45:32,761  DEBUG  Lock 4722721616 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/1f1d9aaca301414e7f6c9396df506798ff4eb9a6.lock
+2024-05-21 02:45:32,896  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/merges.txt HTTP/1.1" 200 0
+2024-05-21 02:45:32,897  DEBUG  Attempting to acquire lock 4721055584 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/226b0752cac7789c48f0cb3ec53eda48b7be36cc.lock
+2024-05-21 02:45:32,898  DEBUG  Lock 4721055584 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/226b0752cac7789c48f0cb3ec53eda48b7be36cc.lock
+2024-05-21 02:45:33,025  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/merges.txt HTTP/1.1" 200 456318
+2024-05-21 02:45:33,328  DEBUG  Attempting to release lock 4721055584 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/226b0752cac7789c48f0cb3ec53eda48b7be36cc.lock
+2024-05-21 02:45:33,328  DEBUG  Lock 4721055584 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/226b0752cac7789c48f0cb3ec53eda48b7be36cc.lock
+2024-05-21 02:45:33,461  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/tokenizer.json HTTP/1.1" 200 0
+2024-05-21 02:45:33,462  DEBUG  Attempting to acquire lock 4723135824 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/4b988bccc9dc5adacd403c00b4704976196548f8.lock
+2024-05-21 02:45:33,462  DEBUG  Lock 4723135824 acquired on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/4b988bccc9dc5adacd403c00b4704976196548f8.lock
+2024-05-21 02:45:33,603  DEBUG  https://huggingface.co:443 "GET /gpt2/resolve/main/tokenizer.json HTTP/1.1" 200 1355256
+2024-05-21 02:45:34,091  DEBUG  Attempting to release lock 4723135824 on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/4b988bccc9dc5adacd403c00b4704976196548f8.lock
+2024-05-21 02:45:34,092  DEBUG  Lock 4723135824 released on /Users/vicenteherrera/.cache/huggingface/hub/.locks/models--gpt2/4b988bccc9dc5adacd403c00b4704976196548f8.lock
+2024-05-21 02:45:34,228  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/added_tokens.json HTTP/1.1" 404 0
+2024-05-21 02:45:34,356  DEBUG  https://huggingface.co:443 "HEAD /gpt2/resolve/main/special_tokens_map.json HTTP/1.1" 404 0
+2024-05-21 02:45:34,494  INFO  harness init: <garak.harnesses.probewise.ProbewiseHarness object at 0x11979a4b0>
+2024-05-21 02:45:34,495  INFO  probe queue: probes.dan.AutoDANCached
+2024-05-21 02:45:34,498  INFO  probe init: {self}
+2024-05-21 02:45:34,498  DEBUG  deprecation warning - probe probes.dan.AutoDANCached using recommend_detector instead of primary_detector
+2024-05-21 02:45:34,499  INFO  detector init: <garak.detectors.dan.DAN object at 0x119c102f0>
+2024-05-21 02:45:34,499  INFO  detector init: <garak.detectors.mitigation.MitigationBypass object at 0x119a7f3b0>
+2024-05-21 02:45:34,499  INFO  harness init: <garak.harnesses.base.Harness object at 0x1192b9670>
+2024-05-21 02:45:34,501  DEBUG  harness: probe start for garak.probes.dan.AutoDANCached
+2024-05-21 02:45:34,501  DEBUG  probe execute: <garak.probes.dan.AutoDANCached object at 0x119a7f7d0>
