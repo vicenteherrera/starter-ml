@@ -1,4 +1,17 @@
 
+# Using pipx
+
+install_garak:
+	pipx install garak
+
+garak-hg-gpt2:
+	. ./env.txt && garak --model_type huggingface --model_name gpt2 --probes dan.AutoDANCached
+
+garak-oa-gpt3.5-turbo:
+	. ./env.txt && garak --model_type openai --model_name gpt-3.5-turbo --probes dan.AutoDANCached
+
+# Using poetry
+
 all: requirements install_python install download 
 
 run-hg-gpt2:
