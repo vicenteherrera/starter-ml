@@ -1,31 +1,27 @@
 
-FROM python:3.11.7
+FROM python:3.11.2
 
-WORKDIR /app
-
-# Copy existing huggingface cache of models and datasets
-ARG HF_HOME_LOCAL
-ENV HF_HOME="/app/.cache/huggingface/"
-COPY $HF_HOME_LOCAL $HF_HOME
+# FROM python:3.6.6-alpine3.7
 
 ARG YOUR_ENV
+ARG YOUR_HOME
+
 ENV YOUR_ENV=${YOUR_ENV} \
+  YOUR_HOME=${YOUR_HOME} \
   PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
   PYTHONHASHSEED=random \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.8.3
+  POETRY_VERSION=1.6.1
 
-# System deps
+# System deps:
 RUN pip install "poetry==$POETRY_VERSION"
 
 # Copy only requirements to cache them in docker layer
+WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
-
-ENV MODEL="${MODEL}"
-ENV REVISION="${REVISION}"
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
@@ -33,16 +29,3 @@ RUN poetry config virtualenvs.create false \
 
 # Creating folders, and files for a project:
 COPY ./src /app/src
-
-# Set local folder for Huggingface models
-ENV HF_HOME="/app/.cache/huggingface/"
-
-ENV HF_HUB_OFFLINE=1 
-ENV HF_HUB_DISABLE_TELEMETRY=1
-
-ARG MODEL
-ARG REVISION
-ENV MODEL="${MODEL}"
-ENV REVISION="${REVISION}"
-
-CMD ["poetry",  "--quiet", "run", "python", "./src/app.py"]

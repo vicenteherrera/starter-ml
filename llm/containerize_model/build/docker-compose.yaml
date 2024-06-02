@@ -1,0 +1,6 @@
+version: "3.2" # Use version 3.2 or above
+services:
+  my_service:
+    image: quay.io/vicenteherrera/llm-test:no-model
+    volumes:
+      - /home/vicente/code/_vh/starter-ml/llm/containerize_model/.cache:/app/.cache:ro

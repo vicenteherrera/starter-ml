@@ -9,20 +9,9 @@ ARG MODEL_EXT
 ENV MODEL="${MODEL}"
 ENV REVISION="${REVISION}"
 
-# Download cache of models and datasets
-RUN pip install -U "huggingface_hub[cli]"
-ENV HF_HOME="/app/.cache/huggingface/"
-
-RUN --mount=type=secret,id=hf_token \
-	huggingface-cli download --token=$(cat /run/secrets/hf_token) \
-		"${MODEL}" \
-		--revision "${REVISION}" \
-		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
-
 # App specific stuff
 
 ARG YOUR_ENV
-
 ENV YOUR_ENV=${YOUR_ENV} \
   PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -40,7 +29,21 @@ COPY poetry.lock pyproject.toml /app/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
-  && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
+  && poetry install $(test "$YOUR_ENV" == "production" && echo "--no-dev") --no-interaction --no-ansi
+
+
+# Download cache of models and datasets
+
+ENV HF_HOME="/app/.cache/huggingface/"
+
+COPY ./build/model_download.py /app/build/model_download.py
+
+RUN HF_HOME='./.cache/huggingface/' \
+    MODEL="${MODEL}" \
+    REVISION="${REVISION}" \
+    MODEL_EXT="${MODEL_EXT}" \
+    poetry run python ./build/model_download.py  && \
+    rm -rf /app/build
 
 # Creating folders, and files for a project:
 COPY ./src /app/src

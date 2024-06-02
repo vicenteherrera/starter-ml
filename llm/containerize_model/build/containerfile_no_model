@@ -1,0 +1,95 @@
+
+# BUILDER STAGE ---------------------------------------------------------------------------
+# python:3.11.7-bookworm
+FROM python@sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd72147d8 as builder
+
+# python:3.11.7-bookworm -> sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd72147d8
+# https://hub.docker.com/layers/library/python/3.11.7-bookworm/images/sha256-a526139339e938726256809dad42ba8dd4edf3133194dbe6f62d400aff6bb886?context=explore
+
+# We check early that the user ID is a low number
+ARG USER_ID
+RUN if test ${USER_ID:-10000} -lt 1000 ; then echo "Error: USER_ID argument must be greater than 1000" && exit 1 ; fi
+# We accept an input userid to make it easier to run mounting local files from a developers computer
+# It will be used in the next stage, but we want to check and fail early
+
+# We create Python library files as root in builder, that way app will not be able to modify them later
+WORKDIR /build
+
+ARG YOUR_ENV
+ENV YOUR_ENV=${YOUR_ENV} \
+  PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100
+
+# Install a specific Poetry version including hash verification for all dependencies
+COPY requirements/poetry-requirement.out /build/poetry-requirement.out
+RUN pip install --require-hashes -r /build/poetry-requirement.out
+# https://pypi.org/project/poetry/#copy-hash-modal-93691622-555e-44e4-903c-9573b4c9da7d
+# https://pip.pypa.io/en/stable/topics/secure-installs/
+# https://lil.law.harvard.edu/blog/2019/05/20/improving-pip-compile-generate-hashes/
+
+
+# Copy Python build requirements
+COPY poetry.lock pyproject.toml /build/
+
+# Install libraries without a virtual environment (not needed)
+RUN poetry config virtualenvs.create false  && \
+  poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
+
+# Copy and compile source into bytecodes
+COPY ./src /app/src
+RUN python -m compileall /app/src
+
+# Uninstall pip and other package managers and compilers
+RUN pip uninstall -y pip setuptools wheel pyinstaller poetry
+
+# APP STAGE ---------------------------------------------------------------------------
+# debian:bookworm-slim
+FROM python@sha256:53d6284a40eae6b625f22870f5faba6c54f2a28db9027408f4dee111f1e885a2 as app
+
+# python:3.11.7-slim-bookworm -> sha256:53d6284a40eae6b625f22870f5faba6c54f2a28db9027408f4dee111f1e885a2
+# https://hub.docker.com/layers/library/python/3.11.7-slim-bookworm/images/sha256-1321a0be9c13828a9b489310f1b1c265f07c5be0e67302e1759ad78da19103a7?context=explore
+# debian:bookworm-slim -> sha256:804194b909ef23fb995d9412c9378fb3505fe2427b70f3cc425339e48a828fca
+# https://hub.docker.com/layers/library/debian/bookworm-slim/images/sha256-911821c26cc366231183098f489068afff2d55cf56911cb5b7bd32796538dfe1?context=explore
+
+
+# FROM cgr.dev/chainguard/python:latest as app
+
+# Uninstall pip and other package managers and compilers
+RUN pip uninstall -y pip setuptools wheel
+
+# Copy Python libraries from previous stage
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+
+# Make it easy build and mount model on dev machine using same uid for files
+ARG USER_ID
+USER ${USER_ID:-10000}
+
+WORKDIR /app
+
+# Copy Python source code
+COPY --from=builder --chown=${USER_ID:-10000} /app/src /app/src
+
+# Set Huggingface to operate offline
+ENV HF_HUB_OFFLINE=1
+ENV HF_HUB_DISABLE_TELEMETRY=1
+
+# Set local folder for Huggingface models
+ENV HF_HOME="/app/.cache/huggingface/"
+
+# Your own customization beyond this point -----------
+
+# If exposing a port, declare it explicitely
+# EXPOSE 3000
+
+# Example code uses env to know which model is running
+ARG MODEL
+ARG REVISION
+ENV MODEL="${MODEL}"
+ENV REVISION="${REVISION}"
+
+ENTRYPOINT ["python", "./src/app.py"]
+
