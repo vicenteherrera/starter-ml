@@ -12,3 +12,7 @@ delete:
 
 run:
 	python ./app.py
+
+size:
+	@echo "Size of virtual environment"
+	du -sh .env
