@@ -42,16 +42,21 @@ show:
 info:
 	poetry run poetry env info -p
 
-delete:
-	poetry env remove python
-	rm -r $$HOME/.cache/huggingface/
+delete: delete-venv delete-huggingface-home
+
+delete-venv:
+	poetry env remove --all ||:
+
+delete-huggingface-home:
+	rm -r $$HOME/.cache/huggingface/ ||:
 
 size:
 	@echo "Size of libraries"
 	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of models"
 	@du -sh $$HOME/.cache/huggingface/
-
+	@echo "Size of devpi cache"
+	@du -sh $$HOME/.devpi/server ||:
 # Container targets ------------------------------------------
 
 CONTAINER_IMAGE=quay.io/vicenteherrera/llama2
