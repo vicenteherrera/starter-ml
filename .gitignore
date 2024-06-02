@@ -1,5 +1,6 @@
 **/env.txt
 **/.env
-**/garak_runs
 *.log
 devpi/secret/secretfile
+**/garak_runs
+llm/_security/simple_garak/runs/**

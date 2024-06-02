@@ -5,20 +5,20 @@ install_garak:
 	pipx install garak
 
 garak-hg-gpt2:
-	. ./env.txt && garak --model_type huggingface --model_name gpt2 --probes dan.AutoDANCached
+	. ./env.txt && garak --model_type huggingface --model_name gpt2 --probes dan
 
 garak-oa-gpt3.5-turbo:
-	. ./env.txt && garak --model_type openai --model_name gpt-3.5-turbo --probes dan.AutoDANCached
+	. ./env.txt && garak --model_type openai --model_name gpt-3.5-turbo --probes dan
 
 # Using poetry
 
 all: requirements install_python install download 
 
 run-hg-gpt2:
-	. ./env.txt && poetry run garak --model_type huggingface --model_name gpt2 --probes dan.AutoDANCached
+	. ./env.txt && poetry run garak --model_type huggingface --model_name gpt2 --probes dan
 
 run-oa-gpt3.5-turbo:
-	. ./env.txt && poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan.AutoDANCached
+	. ./env.txt && poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan
 
 list-probes:
 	poetry run garak --list_probes
@@ -50,12 +50,14 @@ info:
 	poetry run poetry env info -p
 
 delete:
-	poetry env remove python
-	rm -r $$HOME/.cache/huggingface/
+	poetry env remove --all ||:
+	rm -r $$HOME/.cache/huggingface/ ||:
 
 size:
 	@echo "Size of libraries"
 	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of models"
 	@du -sh $$HOME/.cache/huggingface/
+	@echo "Size of devpi cache"
+	@du -sh $$HOME/.devpi/server
 
