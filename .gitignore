@@ -2,3 +2,4 @@
 **/.env
 **/garak_runs
 *.log
+devpi/secret/secretfile
