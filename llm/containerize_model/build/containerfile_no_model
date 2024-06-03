@@ -25,8 +25,8 @@ ENV YOUR_ENV=${YOUR_ENV} \
   PIP_DEFAULT_TIMEOUT=100
 
 # Install a specific Poetry version including hash verification for all dependencies
-COPY requirements/poetry-requirement.out /build/poetry-requirement.out
-RUN pip install --require-hashes -r /build/poetry-requirement.out
+COPY ./base_requirements/poetry.out /build/poetry.out
+RUN pip install --require-hashes -r /build/poetry.out
 # https://pypi.org/project/poetry/#copy-hash-modal-93691622-555e-44e4-903c-9573b4c9da7d
 # https://pip.pypa.io/en/stable/topics/secure-installs/
 # https://lil.law.harvard.edu/blog/2019/05/20/improving-pip-compile-generate-hashes/
