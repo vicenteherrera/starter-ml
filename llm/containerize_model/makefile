@@ -16,7 +16,7 @@ all: requirements install_python install download run-offline size
 
 run: run-offline
 
-run-online:
+run-online-local:
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./src/app.py
@@ -84,6 +84,13 @@ requirements:
 	which poetry
 	which huggingface-cli
 	test -f ./env.txt
+
+refresh: delete-venv
+	pyenv uninstall $$(cat .python-version) -s ||:
+	pyenv install $$(cat .python-version) -s
+	rm poetry-lock
+	poetry install --no-root
+
 
 vulnerability-scan:
 	trivy filesystem poetry.lock --scanners vuln
@@ -183,12 +190,12 @@ container-build-no-model-bin:
 	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}
 
 container-run-no-model:
-	${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}:no-model ls -la ./src
+	${RUNSUDO} docker run -it ${CONTAINER_IMAGE}:no-model
 
 container-run-no-model-volume:
 	@PROJ_HOME=$$PWD  && \
-	${RUNSUDO} docker run -i -t \
-		-v "$$PROJ_HOME/.cache":/code/.cache:ro \
+	${RUNSUDO} docker run -it \
+		-v "$$PROJ_HOME/.cache":/app/.cache:ro \
 		-u $$(id -u):$$(id -g) \
 		${CONTAINER_IMAGE}:no-model
 # We need to change the container user to have access to the mounted files
