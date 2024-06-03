@@ -85,10 +85,10 @@ requirements:
 	which huggingface-cli
 	test -f ./env.txt
 
-refresh: delete-venv
-	pyenv uninstall $$(cat .python-version) -s ||:
-	pyenv install $$(cat .python-version) -s
-	rm poetry-lock
+refresh: delete_venv
+	pyenv uninstall -f $$(cat .python-version)
+	pyenv install $$(cat .python-version)
+	rm poetry.lock
 	poetry install --no-root
 
 
