@@ -57,6 +57,7 @@ download-local:
 		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
 
 download-local-py:
+	source env.txt && \
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./build/model_download.py
