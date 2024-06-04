@@ -39,11 +39,22 @@ COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false  && \
   poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
-# Copy and compile source into binary
+# Copy sources
 COPY ./src ./src
-RUN mkdir -p ./bin && \
-  cd ./bin  && \
+
+# Compile source into binary with pyinstaller
+COPY base_requirements/pyinstaller.out ./pyinstaller.out
+RUN pip install --require-hashes -r ./pyinstaller.out
+RUN mkdir -p ./bin && cd ./bin  && \
   pyinstaller --onefile ../src/app.py
+
+# # Compile source into binary with nuitka
+# COPY base_requirements/nuitka.out ./nuitka.out
+# # TODO: find a base image with patchelf, or check it's hash before installing
+# RUN apt update && apt install patchelf=0.14.3-1+b1
+# RUN pip install --require-hashes -r ./nuitka.out
+# RUN mkdir -p ./bin && cd ./bin  && \
+#   python -m nuitka --onefile ../src/app.py
 
 # APP STAGE ---------------------------------------------------------------------------
 # debian:bookworm-slim
@@ -62,7 +73,8 @@ USER ${USER_ID:-10000}
 WORKDIR /app
 
 # Copy binary file
-COPY --from=builder --chown=${USER_ID:-10000} /build/bin/dist /app/bin
+COPY --from=builder --chown=${USER_ID:-10000} /build/bin/dist/app /app/bin/app
+# COPY --from=builder --chown=${USER_ID:-10000} /build/bin/app.bin /app/bin/app
 
 # Set Huggingface to operate offline
 ENV HF_HUB_OFFLINE=1
