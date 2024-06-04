@@ -28,6 +28,12 @@ requirements:
 	which pyenv
 	which poetry
 
+refresh: delete_venv
+	pyenv uninstall -f $$(cat .python-version)
+	pyenv install $$(cat .python-version)
+	rm poetry.lock
+	poetry install --no-root
+
 # Libraries utilities ----------------------------------------
 
 install:
