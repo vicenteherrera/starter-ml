@@ -1,5 +1,5 @@
 
-all: requirements install_python install download run size
+all: requirements install_python install required_python download run size
 
 run:
 	poetry run python ./src/app.py
@@ -7,15 +7,38 @@ run:
 download:
 	poetry run python ./src/model-download.py
 
-install_python:
-	pyenv install $$(cat .python-version) -s
-
 code:
 	poetry run code .
+
+# requirements ----------------------------------------------------------------
 
 requirements:
 	which pyenv
 	which poetry
+
+install_python: upgrade_pyenv
+	pyenv install $$(cat .python-version) -s
+
+upgrade_pyenv:
+	cd $$HOME/.pyenv && git pull
+
+required_python:
+	@PVPOETRY="$$(poetry run python --version)" && \
+	PVPOETRY=$${PVPOETRY#"Python "} && \
+	PV="$$(cat .python-version)" && \
+	if [ "$$PVPOETRY" != "$$PV" ]; then \
+		echo "**Error, Python version mismatch" && \
+		echo ".python-version file: $$PV" && \
+		echo "poetry run python --version: $$PVPOETRY" && \
+		echo "Run make refresh and check your pyenv path configuration" && \
+		exit 1; \
+	fi
+
+refresh: delete_venv
+	pyenv uninstall -f $$(cat .python-version)
+	pyenv install $$(cat .python-version)
+	rm poetry.lock
+	poetry install --no-root
 
 # Libraries utilities ----------------------------------------
 
@@ -43,15 +66,9 @@ size:
 	@echo "Size of libraries"
 	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of models"
-	@du -sh $$HOME/.cache/huggingface/
-
-size:
-	@echo "Size of libraries"
-	@du -sh $$(poetry env info --path 2>/dev/null)
-	@echo "Size of models"
-	@du -sh $$HOME/.cache/huggingface/
+	@du -sh $$HOME/.cache/huggingface/ ||:
 	@echo "Size of devpi cache"
-	@du -sh $$HOME/.devpi/server
+	@du -sh $$HOME/.devpi/server ||:
 
 # Container targets ------------------------------------------
 

@@ -1,5 +1,5 @@
 
-all: requirements install_python install required_python jupyter
+all: requirements  install_python install required_python jupyter
 
 jupyter:
 	poetry run jupyter-lab
@@ -7,12 +7,17 @@ jupyter:
 run:
 	poetry run python ./starter_ml/hugging-face.py
 
-install_python:
-	pyenv install $$(cat .python-version) -s
+# requirements ----------------------------------------------------------------
 
 requirements:
 	which pyenv
 	which poetry
+
+install_python: upgrade_pyenv
+	pyenv install $$(cat .python-version) -s
+
+upgrade_pyenv:
+	cd $$HOME/.pyenv && git pull
 
 required_python:
 	@PVPOETRY="$$(poetry run python --version)" && \
