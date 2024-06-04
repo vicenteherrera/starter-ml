@@ -69,32 +69,3 @@ size:
 	@du -sh $$HOME/.cache/huggingface/ ||:
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
-
-# Container targets ------------------------------------------
-
-CONTAINER_IMAGE=quay.io/vicenteherrera/llama2
-
-# Check if sudo is required to run Docker
-RUNSUDO := $(shell groups | grep ' docker ' 1>/dev/null || echo "sudo")
-
-# https://docs.docker.com/engine/install/debian/#install-using-the-repository
-
-.PHONY: container-build
-# build the container image
-
-vulnerability-scan:
-	trivy filesystem poetry.lock --scanners vuln
-
-container-build-copy:
-	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f containerfile_copy -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
-
-container-build-download:
-	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f containerfile_download -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
-
-container-run:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/app.py
-
-container-vulnerability-scan:
-	trivy image ${CONTAINER_IMAGE} --scanners vuln
