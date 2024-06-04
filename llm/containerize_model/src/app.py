@@ -19,13 +19,13 @@ def __main__():
       for i in range(torch.cuda.device_count()):
         print(f"CUDA GPU {i}: {torch.cuda.get_device_name(i)}")
 
-  tokenizer = AutoTokenizer.from_pretrained(model_name)
+  tokenizer = AutoTokenizer.from_pretrained(model_name, revision=model_revision)
 
   print("Loading model:", model_name)
   loading_time = time.time()
   dtype = torch.float16 if torch.cuda.is_available() else torch.float32 
   pipeline = transformers.pipeline(
-    "text-generation", model=model_name,
+    "text-generation", model=model_name, revision=model_revision
     torch_dtype=dtype, device_map="auto",
   )
   print('Model loaded in:', (time.time() - loading_time), 'seconds')

@@ -3,12 +3,15 @@ import transformers
 import torch
 from dotenv import dotenv_values
 import time
+import os
 
-print("# Executing model")
+model_name = os.environ["MODEL"]
+model_revision = os.environ["REVISION"]
+# model_ext = os.environ["MODEL_EXT"]
+print("Run model: " + model_name + ", revision: " + model_revision)
 
 start_time = time.time()
 config = dotenv_values('env.txt')
-model_name = "meta-llama/Llama-2-7b-chat-hf"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('Using device:', device)
@@ -18,6 +21,7 @@ if device.type == 'cuda':
 
 tokenizer = AutoTokenizer.from_pretrained(
   model_name,
+  revision=model_revision,
   token=config["HUGGINGFACE_TOKEN"],
 )
 
@@ -30,6 +34,7 @@ else:
 pipeline = transformers.pipeline(
   "text-generation",
   model=model_name,
+  revision=model_revision,
   torch_dtype=dtype,
   device_map="auto",
   token=config["HUGGINGFACE_TOKEN"],
