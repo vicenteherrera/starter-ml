@@ -1,32 +1,59 @@
 
-all: requirements install_python install run size
+all: requirements install_python install required_python size help
 
-run:
-	poetry run python ./src/app.py
-
-run2:
-	poetry run python ./src/app2.py
+help:
+	@echo ""
+	@echo "# User discloses private information to AI endpoint (OpenAI)"
+	@echo "make run-unprotected   # Discloses private information"
+	@echo "make run-protected     # Private information is filtered"
+	@echo "# User queries information out of context"
+	@echo "make run-no-injection2 # No injection"
+	@echo "make run-unprotected2  # With prompt injection"
+	@echo "make run-protected2    # Prompt injection is blocked"
 
 run-unprotected:
-	poetry run python ./src/app-unprotected.py 
+	poetry run python ./src/app1-unprotected.py 
+
+run-protected:
+	poetry run python ./src/app1-protected.py
+
+run-no-injection2:
+	poetry run python ./src/app2-no-injection.py 
 
 run-unprotected2:
-	poetry run python ./src/app-unprotected2.py 
+	poetry run python ./src/app2-unprotected.py 
 
-run-blocked2:
-	poetry run python ./src/app-blocked2.py 
+run-protected2:
+	poetry run python ./src/app2-protected.py 
 
-# ---------------------------------------
 
-install_python:
-	pyenv install $$(cat .python-version) -s
 
 code:
 	poetry run code .
 
+# requirements ----------------------------------------------------------------
+
 requirements:
 	which pyenv
 	which poetry
+
+install_python: upgrade_pyenv
+	pyenv install $$(cat .python-version) -s
+
+upgrade_pyenv:
+	cd $$HOME/.pyenv && git pull
+
+required_python:
+	@PVPOETRY="$$(poetry run python --version)" && \
+	PVPOETRY=$${PVPOETRY#"Python "} && \
+	PV="$$(cat .python-version)" && \
+	if [ "$$PVPOETRY" != "$$PV" ]; then \
+		echo "**Error, Python version mismatch" && \
+		echo ".python-version file: $$PV" && \
+		echo "poetry run python --version: $$PVPOETRY" && \
+		echo "Run make refresh and check your pyenv path configuration" && \
+		exit 1; \
+	fi
 
 refresh: delete_venv
 	pyenv uninstall -f $$(cat .python-version)
@@ -63,31 +90,7 @@ size:
 	@du -sh $$HOME/.cache/huggingface/
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
-# Container targets ------------------------------------------
-
-CONTAINER_IMAGE=quay.io/vicenteherrera/llama2
-
-# Check if sudo is required to run Docker
-RUNSUDO := $(shell groups | grep ' docker ' 1>/dev/null || echo "sudo")
-
-# https://docs.docker.com/engine/install/debian/#install-using-the-repository
-
-.PHONY: container-build
-# build the container image
 
 vulnerability-scan:
 	trivy filesystem poetry.lock --scanners vuln
 
-container-build-copy:
-	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f containerfile_copy -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
-
-container-build-download:
-	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f containerfile_download -t ${CONTAINER_IMAGE} --build-arg YOUR_HOME="$$HOME" --build-context huggingface="$$HOME/.cache/huggingface"
-
-container-run:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE} poetry run python ./src/app.py
-
-container-vulnerability-scan:
-	trivy image ${CONTAINER_IMAGE} --scanners vuln
