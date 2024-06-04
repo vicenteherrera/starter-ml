@@ -1,3 +1,4 @@
 # devpi
 
-Local server for Python pip packages
+Local server for Python pip packages.
+

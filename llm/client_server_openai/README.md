@@ -1,3 +1,7 @@
+# client_server_openai
+
+Create a server LLM endpoint for OpenAI, and a client to connect to it using Streamlit chat UI.
+
 
 Based on: 
 * https://github.com/madhusudhankonda/langchain-play
