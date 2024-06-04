@@ -21,6 +21,7 @@ Each example has a README.md file explaining it. Continue reading here first for
   * _security
     * [simple_garak](llm/_security/simple_garak): Scan OpenAI and local models with Garak vuln analysis.
     * [llm_guard_openai](llm/_security/llm_guard_openai): Test LLM Guard mitigation with OpenAI endpoint.
+    * [terrapin](llm/_security/terrapin): Model attestation using Terrapin.
 
 ## Prerequisites
 
