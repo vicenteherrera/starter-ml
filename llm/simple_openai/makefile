@@ -1,5 +1,5 @@
 create_venv:
-	python -m venv .env
+	python3 -m venv .env
 	@echo "Activate in Win, with: .env\Scripts\activate"
 	@echo "Activate in Bash with: source .env/bin/activate"
 	@echo "Activate in Fish with: . .env/bin/activate.fish"
@@ -11,7 +11,7 @@ delete:
 	rm -rf .env
 
 run:
-	python ./app.py
+	python3 ./app.py
 
 size:
 	@echo "Size of virtual environment"
