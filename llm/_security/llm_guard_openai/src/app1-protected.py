@@ -1,14 +1,12 @@
 import os
-
 from openai import OpenAI
-
 from llm_guard import scan_output, scan_prompt
 from llm_guard.input_scanners import Anonymize, PromptInjection, TokenLimit, Toxicity
 from llm_guard.output_scanners import Deanonymize, NoRefusal, Relevance, Sensitive
 from llm_guard.vault import Vault
 from dotenv import dotenv_values
 
-config = dotenv_values('env.txt')
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
 client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
 vault = Vault()

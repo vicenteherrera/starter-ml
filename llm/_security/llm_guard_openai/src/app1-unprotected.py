@@ -1,10 +1,8 @@
 import os
-
 from openai import OpenAI
-
 from dotenv import dotenv_values
 
-config = dotenv_values('env.txt')
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
 client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
 prompt = "Make an SQL insert statement to add a new user to our database. Name is Vicente Herrera. Email is vicenteherrera@vicenteherrera.com "
