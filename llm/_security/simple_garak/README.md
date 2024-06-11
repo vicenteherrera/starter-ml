@@ -12,7 +12,7 @@ Copy `env-sample.txt` as `env.txt` and put your API keys there.
 
 You can use pipx to install Garak globally, or activate the Poetry virtual environment to have it installed there.
 
-```console
+```bash
 # Using pipx
 
 ## Install Garak with pipx

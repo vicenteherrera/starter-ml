@@ -8,7 +8,7 @@ Check the general prerequisites explained in [the main README.md](../../../READM
 
 This instructions assumes you have installed a modern [Go](https://go.dev/doc/install) version.
 
-```console
+```bash
 # Clone source repository and build Terrapin binary from sources
 git clone https://github.com/fkautz/terrapin-go.git
 cd terrapin-go
@@ -18,7 +18,7 @@ cd ..
 
 # Attestations
 
-```console
+```bash
 # Initialize tooling, download model, and test run it
 make
 

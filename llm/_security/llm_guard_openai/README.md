@@ -12,7 +12,7 @@ Copy `env-sample.txt` as `env.txt` and put your API keys there.
 
 ## Instructions
 
-```console
+```bash
 # Prepare all requirements, virtual environment, dependencies
 make
 

@@ -31,6 +31,8 @@ All examples except `simple_openai` rely on `pyenv` and `poetry` and a fixed `po
 
 On Linux for some local models, before you install a specific Python version, you need to install the `libffi` package with: `sudo apt-get install libffi-dev`.
 
+You have the alternative to use a container image to navigate and test the examples, use `cd _utils ; make`. 
+
 Examples have a `makefile` with several targets, most of the time just executing `make` will setup and install everything, as well as execute the main example in the directory.
 
 
@@ -47,7 +49,7 @@ Other examples require a paid [OpenAI](https://platform.openai.com/account/api-k
 
 ### libcudnn.so
 
-```console
+```
 libcudnn.so.8: cannot open shared object file: No such file or directory
 ```
 * Make sure to install the latest `torch` library that works with CUDA driver on Windows native or WSL.
@@ -55,13 +57,14 @@ libcudnn.so.8: cannot open shared object file: No such file or directory
 
 ### _ctypes
 
-```console
+```
 ModuleNotFoundError: No module named '_ctypes'
 ```
 * You have to install `libffi-devel` before installing the specific python version
   `sudo apt-get install libffi-dev`  
 * Reinstall after that the PyEnv Python version in the project folder with:
-```console
+
+```bash
 pyenv uninstall $(cat .python-version)
 pyenv install $(cat .python-version)
 ```
