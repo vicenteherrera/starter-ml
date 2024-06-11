@@ -2,6 +2,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import gradio as gr
 from dotenv import dotenv_values
+import os
 
 # Based on: https://insights.sei.cmu.edu/blog/creating-a-large-language-model-application-using-gradio/
 
