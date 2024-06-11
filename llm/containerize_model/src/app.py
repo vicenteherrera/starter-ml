@@ -25,7 +25,7 @@ def __main__():
   loading_time = time.time()
   dtype = torch.float16 if torch.cuda.is_available() else torch.float32 
   pipeline = transformers.pipeline(
-    "text-generation", model=model_name, revision=model_revision
+    "text-generation", model=model_name, revision=model_revision,
     torch_dtype=dtype, device_map="auto",
   )
   print('Model loaded in:', (time.time() - loading_time), 'seconds')
