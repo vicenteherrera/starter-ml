@@ -1,6 +1,29 @@
+SHELL := /bin/bash
 
-code:
-	poetry run code .
+# Using poetry
+
+all: requirements install_python install help
+
+help:
+	@echo ""
+	@echo "HELP"
+	@echo "Evaluate 'Do Anything Now' probes on local GPT2 open source model from Huggingface:"
+	@echo "make run-hg-gpt2"
+	@echo "Evaluate 'Do Anything Now' probes on OpenAI GPT-3.5-turbo:"
+	@echo "make run-oa-gpt3.5-turbo"
+
+run-hg-gpt2:
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+	HF_HOME='./.cache/huggingface' \
+	poetry run garak --model_type huggingface --model_name gpt2 --probes dan
+
+run-oa-gpt3.5-turbo:
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+	HF_HOME='./.cache/huggingface' \
+	poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan
+
+list-probes:
+	poetry run garak --list_probes
 
 # Using pipx
 
