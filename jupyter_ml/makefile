@@ -51,9 +51,9 @@ show:
 info:
 	poetry run poetry env info -p
 
-delete: delete-venv
+delete: delete_venv
 
-delete-venv:
+delete_venv:
 	poetry env remove --all ||:/
 
 size:

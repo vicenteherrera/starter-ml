@@ -26,8 +26,6 @@ run-unprotected2:
 run-protected2:
 	poetry run python ./src/app2-protected.py 
 
-
-
 code:
 	poetry run code .
 

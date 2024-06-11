@@ -6,11 +6,11 @@ run:
 	@echo "To run the client, use: make run_client"
 
 run_server:
-	@echo "Execute also client on another terminal with: make run_server"
+	@echo "Execute also client on another terminal with: make run_client"
 	@poetry run python ./src/openai_llm_server.py
 
 run_client:
-	@echo "Execute also server on another terminal with: make run_client"
+	@echo "Execute also server on another terminal with: make run_server"
 	@poetry run streamlit run ./src/openai_llm_client.py
 
 code:
@@ -60,9 +60,9 @@ show:
 info:
 	poetry run poetry env info -p
 
-delete: delete-venv delete-huggingface-home
+delete: delete_venv
 
-delete-venv:
+delete_venv:
 	poetry env remove --all ||:
 
 size:

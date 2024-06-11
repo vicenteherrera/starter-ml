@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
 MODEL_EXT=*.safetensors
 REVISION=main
@@ -83,13 +85,13 @@ show:
 info:
 	poetry run poetry env info -p
 
-delete: delete-venv delete-huggingface-home
+delete: delete_venv delete_huggingface_home
 
-delete-venv:
+delete_venv:
 	poetry env remove --all ||:
 
-delete-huggingface-home:
-	rm -r $$HOME/.cache/huggingface/ ||:
+delete_huggingface_local:
+	rm -r ./.cache/huggingface/ ||:
 
 size:
 	@echo "Size of libraries"

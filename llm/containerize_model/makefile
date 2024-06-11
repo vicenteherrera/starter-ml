@@ -12,7 +12,7 @@ REVISION=main
 
 CONTAINER_IMAGE=quay.io/vicenteherrera/llm-test
 
-all: requirements install_python install required_python download run-offline size
+all: requirements install_python install required_python download run-offline-local size
 
 code:
 	poetry run code .
