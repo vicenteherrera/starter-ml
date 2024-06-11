@@ -14,7 +14,7 @@ import os
 from dotenv import dotenv_values
 
 # Set OpenAI API key
-config = dotenv_values('env.txt')
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../') if os.path.exists(f"{p}env.txt")), {})
 
 # Model to use
 # llm_model = "gpt-3.5-turbo"

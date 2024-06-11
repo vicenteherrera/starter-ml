@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 
 # Based on: https://insights.sei.cmu.edu/blog/creating-a-large-language-model-application-using-gradio/
 
-config = dotenv_values('env.txt') # Set Huggingface token
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../') if os.path.exists(f"{p}env.txt")), {})
 
 model="togethercomputer/RedPajama-INCITE-Chat-3B-v1" # Model
 dtype = torch.float16 if torch.cuda.is_available() else torch.float32 # Set precision based on CPU or GPU available

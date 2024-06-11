@@ -11,7 +11,7 @@ model_revision = os.environ["REVISION"]
 print("Run model: " + model_name + ", revision: " + model_revision)
 
 start_time = time.time()
-config = dotenv_values('env.txt')
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('Using device:', device)

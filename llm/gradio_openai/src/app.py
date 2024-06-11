@@ -4,7 +4,7 @@ import os
 from dotenv import dotenv_values
 
 # Set OpenAI API key
-config = dotenv_values('env.txt')
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../') if os.path.exists(f"{p}env.txt")), {})
 client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
 def predict(message, history):

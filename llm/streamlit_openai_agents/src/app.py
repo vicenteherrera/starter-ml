@@ -12,7 +12,7 @@ import os
 def __main__():
 
     # Set OpenAI API key
-    config = dotenv_values('env.txt')
+    config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../') if os.path.exists(f"{p}env.txt")), {})
     os.environ["OPENAI_API_KEY"] = config['OPENAI_API_KEY']
     # If we try to pass the key as a parameter, some internal calls are made without it and it fails.
     # Setting it as environment guarantees that every call uses the api key.

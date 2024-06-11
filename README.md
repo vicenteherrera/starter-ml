@@ -5,7 +5,7 @@ Introductory examples for using Machine Learning, Large Language Modles (LLM) an
 
 ## Examples
 
-Each example has a README.md file explaining it. Continue reading here first for general instructions.
+Each example has a `README.md` file explaining it. Continue reading down this page first for general instructions.
 
 * [devpi](llm/devpi): Use `devpi` to cache and serve PiPY packages locally.
 * [jupyter_ml](llm/jupyter_ml): Lightweight way to use Jupyter Notebooks locally
@@ -33,16 +33,17 @@ On Linux for some local models, before you install a specific Python version, yo
 
 You have the alternative to use a container image to navigate and test the examples, use `cd _utils ; make`. 
 
-Examples have a `makefile` with several targets, most of the time just executing `make` will setup and install everything, as well as execute the main example in the directory.
-
-
 ## API Keys:
 
 Some examples download models from Huggingface, if you create a free account and [setup an API key token](https://huggingface.co/docs/hub/en/security-tokens), you will ensure you are not throttled when doing so.
 
-Other examples require a paid [OpenAI](https://platform.openai.com/account/api-keys
-) API key, make sure you have introduced your payment methond with them, and have bought some initial credits.
+Other examples require a paid [OpenAI](https://platform.openai.com/account/api-keys) API key, make sure you have introduced your payment methond with them, and have bought some initial credits.
 
+Copy `sample-env.txt` to `env.txt` and put your API keys there. You could do that on individual examples, or globaly with a `env.txt` file on the parent directory where you put all your API keys. Although the file specifies variables prefixing them with `export`, when possible most of the example don't load them into the environment, but process the file and picks the value to be passed to corresponding function calls.
+
+## Running examples
+
+All examples have a `makefile` with several targets, most of the time just executing `make` will setup and install everything, as well as execute the main example in the directory.
 
 
 ## Troubleshooting
@@ -71,4 +72,4 @@ pyenv install $(cat .python-version)
 
 ### Errors while installing a specific Python version with PyEnv
 
-On Linux, if some prerequisite libraries like bz2, lza, tkinter, etc are not present, you will see some error messages while installing a specific Python version. But as these examples do not use them, everything will work. In case you want them check [starter-python](https://github.com/vicenteherrera/starter-python) repository for instructions
+On Linux, if some prerequisite libraries like bz2, lza, tkinter, etc are not present, you will see some error messages while installing a specific Python version. But as these examples do not use them, everything will work. In case you want them check [starter-python](https://github.com/vicenteherrera/starter-python) repository for instructions.

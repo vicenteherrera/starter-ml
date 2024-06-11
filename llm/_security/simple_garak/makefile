@@ -8,23 +8,15 @@ install_garak:
 	pipx install garak
 
 garak-hg-gpt2:
-	. ./env.txt && garak --model_type huggingface --model_name gpt2 --probes dan
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+	HF_HOME='./.cache/huggingface' \
+	garak --model_type huggingface --model_name gpt2 --probes dan
 
 garak-oa-gpt3.5-turbo:
-	. ./env.txt && garak --model_type openai --model_name gpt-3.5-turbo --probes dan
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+	HF_HOME='./.cache/huggingface' \
+	garak --model_type openai --model_name gpt-3.5-turbo --probes dan
 
-# Using poetry
-
-all: requirements install_python install download 
-
-run-hg-gpt2:
-	. ./env.txt && poetry run garak --model_type huggingface --model_name gpt2 --probes dan
-
-run-oa-gpt3.5-turbo:
-	. ./env.txt && poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan
-
-list-probes:
-	poetry run garak --list_probes
 
 # requirements ----------------------------------------------------------------
 
