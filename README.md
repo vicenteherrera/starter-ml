@@ -7,11 +7,12 @@ Introductory examples for using Machine Learning, Large Language Modles (LLM) an
 
 Each example has a `README.md` file explaining it. Continue reading down this page first for general instructions.
 
+* [_utils](_utils): General utilities, like a container with PyEnv and Poetry to use as an instant development shell.
 * [devpi](llm/devpi): Use `devpi` to cache and serve PiPY packages locally.
-* [jupyter_ml](llm/jupyter_ml): Lightweight way to use Jupyter Notebooks locally
-* llm.
-  * [simple_openai](llm/simple_openai): Call OpenAI endpoint with prompt
-  * [simple_local_model](llm/simple_local_model): Download and call local LLM with prompt
+* [jupyter_ml](llm/jupyter_ml): Lightweight way to use Jupyter Notebooks locally.
+* **llm (Large Language Models)**
+  * [simple_openai](llm/simple_openai): Call OpenAI endpoint with prompt.
+  * [simple_local_model](llm/simple_local_model): Download and call local LLM with prompt.
   * [rag_langchain_openai](llm/rag_langchain_openai): Prepare document for Retrieval Augmented Generation (RAG) in a vector DB and prompt it using OpenAI.
   * [gradio_openai](llm/gradio_openai): Use OpenAI with custom Gradio chat UI.
   * [gradio_local_model](llm/gradio_local_model): Use local LLM with custom Gradio chat UI.
@@ -25,11 +26,13 @@ Each example has a `README.md` file explaining it. Continue reading down this pa
 
 ## Prerequisites
 
-The examples make extensive use of `pyenv` and `poetry` to achieve repeatible environments. Check the [starter-python](https://github.com/vicenteherrera/starter-python) repository on how to install these requirements.
+All examples except `simple_openai` rely on `pyenv` and `poetry` and a fixed `poetry.lock` file to provide perfectly repeatable environments. Check the [starter-python](https://github.com/vicenteherrera/starter-python) repository on how to install these requirements. 
 
-All examples except `simple_openai` rely on `pyenv` and `poetry` and a fixed `poetry.lock` file to provide perfectly repeatable environments. When you open a terminal within _Visual Studio Code_, it tries to activate the virtual environment. As this project has many virtual environments if you install all of them, it may confuse it, so if you plan to run commands through the Visual Studio Code terminal, it's best to open just the example directory with Code to do so.
+When you open a terminal within _Visual Studio Code_, it tries to activate the virtual environment. As this project has many virtual environments if you install all of them, it may confuse it, so if you plan to run commands through the Visual Studio Code terminal, it's best to open just the example directory with Code to do so.
 
 On Linux for some local models, before you install a specific Python version, you need to install the `libffi` package with: `sudo apt-get install libffi-dev`.
+
+To run Jupyter you have to install `libsqlite3-dev`. Check the troubleshooting section about that.
 
 You have the alternative to use a container image to navigate and test the examples, use `cd _utils ; make`. 
 
@@ -69,6 +72,21 @@ ModuleNotFoundError: No module named '_ctypes'
 pyenv uninstall $(cat .python-version)
 pyenv install $(cat .python-version)
 ```
+
+### ModuleNotFoundError: No module named 'pysqlite2'
+
+If you get this error, probably while running Jupyter, you need to install Sqlite before installing the specific Python version with PyEnv:
+
+```bash
+sudo apt-get install libsqlite3-dev
+```
+
+If you already had Python installed, you can reinstall it after you update this package, and rebuild the virtual environment with the new binary using:
+
+```bash
+make refresh
+```
+
 
 ### Errors while installing a specific Python version with PyEnv
 
