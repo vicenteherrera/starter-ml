@@ -3,12 +3,14 @@ import transformers
 import torch
 from dotenv import dotenv_values
 import time
+import os
 
 print("# Downloading model")
 
 start_time = time.time()
-config = dotenv_values('env.txt')
-model_name = "meta-llama/Llama-2-7b-chat-hf"
+config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../') if os.path.exists(f"{p}env.txt")), {})
+model_name = os.environ["MODEL"]
+model_revision = os.environ["REVISION"]
 
 tokenizer = AutoTokenizer.from_pretrained(
   model_name,

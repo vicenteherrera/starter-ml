@@ -1,14 +1,43 @@
+MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
+MODEL_EXT=*.safetensors
+REVISION=main
 
 all: requirements install_python install required_python download run size
 
-run:
-	poetry run python ./src/app.py
-
-download:
-	poetry run python ./src/model-download.py
-
 code:
 	poetry run code .
+
+# run ----------------------------------------------------------------
+
+run: run-offline-local
+
+run-online-local:
+	HF_HOME='./.cache/huggingface/' \
+	MODEL="${MODEL}" REVISION="${REVISION}" \
+	poetry run python ./src/app.py
+
+run-offline-local:
+	HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
+	HF_HOME='./.cache/huggingface/' \
+	MODEL="${MODEL}" REVISION="${REVISION}" \
+	poetry run python ./src/app.py
+
+# download ----------------------------------------------------------------
+
+download: download-local
+
+download-local:
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+	HF_HOME='./.cache/huggingface/' \
+	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
+		"${MODEL}" \
+		--revision "${REVISION}" \
+		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
+
+download-local-py:
+	HF_HOME='./.cache/huggingface/' \
+	MODEL="${MODEL}" REVISION="${REVISION}" \
+	poetry run python ./build/model_download.py
 
 # requirements ----------------------------------------------------------------
 
