@@ -1,0 +1,41 @@
+
+# python:3.11.7-bookworm 
+FROM python@sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd72147d8 as builder
+
+ARG USER_ID
+RUN if test ${USER_ID:-10000} -lt 1000 ; then echo "Error: USER_ID argument must be greater than 1000" && exit 1 ; fi
+# We accept an input userid to make it easier to run mounting local files from a developers computer
+
+ARG YOUR_ENV
+ENV YOUR_ENV=${YOUR_ENV} \
+  PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100
+
+
+COPY ./poetry.out ./poetry.out
+RUN pip install --require-hashes -r ./poetry.out && \
+    rm ./poetry.out && \
+    apt-get install libffi-dev
+
+
+ARG USER_ID
+USER ${USER_ID:-10000}
+
+ENV HOME="/home/user"
+WORKDIR ${HOME}
+RUN echo 'export PS1="\w $ "' > ${HOME}/.bashrc
+# PyEnv
+# RUN apt-get install -y git
+RUN git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
+ENV PYENV_ROOT="${HOME}/.pyenv"
+ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+
+# Set local folder for Huggingface models
+ENV HF_HOME="${HOME}/.cache/huggingface/"
+
+CMD ["/bin/bash"]
+
