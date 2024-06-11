@@ -49,7 +49,7 @@ run-offline-local-bin:
 download: download-local
 
 download-local:
-	source env.txt && \
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
 	HF_HOME='./.cache/huggingface/' \
 	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
 		"${MODEL}" \
@@ -57,13 +57,12 @@ download-local:
 		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
 
 download-local-py:
-	source env.txt && \
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./build/model_download.py
 
 download-home:
-	source env.txt && \
+	source "$$(for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
 	HF_HOME="$$HOME/.cache/huggingface/" && \
 	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
 		"${MODEL}" \
