@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fronted
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-app
+      env: frontend
+  template:
+    metadata:
+      labels:
+        app: chat-app
+        env: frontend
+    spec:
+      containers:
+      - name: frontend-container
+        image: quay.io/vicenteherrera/test-llm-frontend:streamlit-0.0.1
+        env:
+          - name: SERVER_URL
+            value: http://backend-service:3000/ask
+        ports:
+        - containerPort: 8501
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault

@@ -3,11 +3,9 @@ import requests
 import os
 
 SERVER_URL = os.getenv("SERVER_URL")
-
-if SERVER_URL == "":
+if SERVER_URL == None or SERVER_URL == "":
     SERVER_URL = "http://127.0.0.1:3000/ask"
-
-print("Using SERVER_URL="+SERVER_URL)
+print(f"Using SERVER_URL={SERVER_URL}")
 
 # Streamlit header
 st.header("Got a question for me?")

@@ -3,7 +3,7 @@ services:
     image: "quay.io/vicenteherrera/test-llm-backend:openai-0.0.1"
     container_name: backend
     volumes:
-      - ../../env.txt:/app/env.txt:ro    
+      - ../../env.txt:/app/config/env.txt:ro    
     # ports:
     #   - "3000:3000"
 

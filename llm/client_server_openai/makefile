@@ -27,3 +27,9 @@ code:
 container-build:
 	cd backend && make -s container-build
 	cd frontend && make -s container-build
+
+
+container-push:
+	cd backend && make -s container-push
+	cd frontend && make -s container-push
+

@@ -87,3 +87,6 @@ container-run:
 		-e SERVER_URL=http://localhost:3000/ask \
 		-it \
 		${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-push:
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}

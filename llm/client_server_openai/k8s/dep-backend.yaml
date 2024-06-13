@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-app
+      env: backend
+  template:
+    metadata:
+      labels:
+        app: chat-app
+        env: backend
+    spec:
+      containers:
+      - name: backend-container
+        image: quay.io/vicenteherrera/test-llm-backend:openai-0.0.1
+        env:
+          - name: CONFIG_FILE
+            value: /app/config/env.txt
+        ports:
+        - containerPort: 3000
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: secret-volume
+          mountPath: "/app/config"
+          readOnly: true
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: sec-openai
+

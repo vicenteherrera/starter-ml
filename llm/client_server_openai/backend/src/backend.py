@@ -2,12 +2,17 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import OpenAI
 from flask import Flask, request, jsonify
-
 from dotenv import dotenv_values
+
+CONFIG_FILE = os.getenv("CONFIG_FILE")
+if CONFIG_FILE == None or CONFIG_FILE == "":
+    CONFIG_FILE = "config/env.txt"
+
+print(f"Using CONFIG_FILE={CONFIG_FILE}")
 
 app = Flask(__name__)
 
-config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
+config = dotenv_values(CONFIG_FILE)
 
 if not "OPENAI_API_KEY" in config:
     print("OPENAI_API_KEY config not found")

@@ -9,8 +9,7 @@ run: run_backend
 
 run_backend:
 	@echo "Execute also fronted on another terminal with: cd ../frontend && make run"
-	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt" "../../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
-	poetry run python ./src/backend.py
+	CONFIG_FILE=../../../env.txt poetry run python ./src/backend.py
 
 code:
 	poetry run code .
@@ -84,6 +83,9 @@ container-build:
 
 container-run:
 	@${RUNSUDO} docker run \
-		-v $$(pwd)/../../../env.txt:/app/env.txt:ro \
+		-v $$(pwd)/../../../env.txt:/app/config/env.txt:ro \
 		-it \
 		${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-push:
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}
