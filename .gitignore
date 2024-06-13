@@ -5,3 +5,4 @@ devpi/secret/secretfile
 **/garak_runs
 llm/_security/simple_garak/runs/**
 **/.cache
+.vscode/
