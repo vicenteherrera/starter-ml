@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
+  name: frontend-service
 spec:
   selector:
-    env: backend
+    env: frontend
   ports:
     - protocol: TCP
       port: 8501
-      targetPort: 8501
+      targetPort: 31045
   type: LoadBalancer
