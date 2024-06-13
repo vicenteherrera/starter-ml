@@ -14,12 +14,16 @@ help:
 run_backend:
 	@echo "Execute also client on another terminal with: make run_frontend"
 	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
-	cd backend && poetry run python ./src/openai_llm_server.py
+	cd backend && poetry run python ./src/backend.py
 
 run_frontend:
 	@echo "Execute also server on another terminal with: make run_backend"
 	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
-	cd frontend && poetry run streamlit run ./src/openai_llm_client.py
+	cd frontend && poetry run streamlit run ./src/frontend.py
 
 code:
 	poetry run code .
+
+container-build:
+	cd backend && make -s container-build
+	cd frontend && make -s container-build

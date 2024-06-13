@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+CONTAINER_IMAGE=quay.io/vicenteherrera/test-llm-frontend
+CONTAINER_TAG=streamlit-0.0.1
+
 all: requirements install_python install required_python run size
 
 run: run_frontend
@@ -7,7 +10,7 @@ run: run_frontend
 run_frontend:
 	@echo "Execute also server on another terminal with: cd ../backend && make run"
 	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt" "../../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
-	poetry run streamlit run ./src/openai_llm_client.py
+	poetry run streamlit run ./src/frontend.py
 
 code:
 	poetry run code .
@@ -66,3 +69,21 @@ size:
 	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
+
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image without model"
+	${RUNSUDO} docker build . -f build/containerfile \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG} \
+		--build-arg USER_ID="$$(id -u)" \
+		--build-arg YOUR_ENV="production"
+
+container-run:
+	${RUNSUDO} docker run \
+		-e SERVER_URL=http://localhost:3000/ask \
+		-it \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG}

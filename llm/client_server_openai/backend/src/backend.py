@@ -9,6 +9,9 @@ app = Flask(__name__)
 
 config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
 
+if not "OPENAI_API_KEY" in config:
+    print("OPENAI_API_KEY config not found")
+    exit()
 
 llm = OpenAI(api_key=config["OPENAI_API_KEY"])
 
@@ -16,7 +19,6 @@ def invoke(prompt):
     response = llm(prompt) # invoke OpenAI LLM
     print(response) # output the response
     return response
-
 
 # Exposing the endpoint 
 @app.route('/ask', methods=['POST'])
@@ -28,7 +30,6 @@ def ask():
     # Return response
     return jsonify({"answer": response})
 
-
 # Run the Flask app
 if __name__ =='__main__':
-    app.run(port=3000)
+    app.run(host='0.0.0.0', port=3000)

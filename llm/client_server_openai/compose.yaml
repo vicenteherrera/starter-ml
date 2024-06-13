@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: "quay.io/vicenteherrera/test-llm-backend:openai-0.0.1"
+    container_name: backend
+    volumes:
+      - ../../env.txt:/app/env.txt:ro    
+    # ports:
+    #   - "3000:3000"
+
+  frontend:
+    image: "quay.io/vicenteherrera/test-llm-frontend:streamlit-0.0.1"
+    container_name: frontend
+    environment:
+      - SERVER_URL=http://backend:3000/ask
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend

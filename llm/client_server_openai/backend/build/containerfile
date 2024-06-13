@@ -1,5 +1,9 @@
 
-FROM python:3.11.7
+# BUILDER STAGE ---------------------------------------------------------------------------
+# python:3.11.7-bookworm
+FROM python@sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd72147d8 as builder
+
+WORKDIR /build
 
 ARG YOUR_ENV
 ENV YOUR_ENV=${YOUR_ENV} \
@@ -8,25 +12,35 @@ ENV YOUR_ENV=${YOUR_ENV} \
   PYTHONHASHSEED=random \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.6.1
+  PIP_DEFAULT_TIMEOUT=100
 
-# System deps:
-RUN pip install "poetry==$POETRY_VERSION"
+# Install a specific Poetry version including hash verification for all dependencies
+COPY ./build/base_requirements/poetry.out /build/poetry.out
+RUN pip install --require-hashes -r /build/poetry.out
 
-USER 1000
+# Copy Python build requirements
+COPY poetry.lock pyproject.toml /build/
+
+# Install libraries without a virtual environment (not needed)
+RUN poetry config virtualenvs.create false  && \
+  poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
+
+
 WORKDIR /app
 
-# Copy only requirements to cache them in docker layer
-COPY poetry.lock pyproject.toml /app/
+# RUN apt-get update && apt-get install -y \
+#     build-essential \
+#     curl \
+#     software-properties-common \
+#     git \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Project initialization:
-RUN poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
-
-# Creating folders, and files for a project:
+# Copy and compile source into bytecodes
 COPY ./src /app/src
 
-ENV HF_HUB_OFFLINE=1
-ENV HF_HUB_DISABLE_TELEMETRY=1
+EXPOSE 3000
 
+# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+ENTRYPOINT ["python", "./src/backend.py"]
 

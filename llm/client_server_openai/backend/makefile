@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+CONTAINER_IMAGE=quay.io/vicenteherrera/test-llm-backend
+CONTAINER_TAG=openai-0.0.1
+
 all: requirements install_python install required_python run size
 
 run: run_backend
@@ -7,7 +10,7 @@ run: run_backend
 run_backend:
 	@echo "Execute also fronted on another terminal with: cd ../frontend && make run"
 	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt" "../../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
-	poetry run python ./src/openai_llm_server.py
+	poetry run python ./src/backend.py
 
 code:
 	poetry run code .
@@ -66,3 +69,21 @@ size:
 	@du -sh $$(poetry env info --path 2>/dev/null)
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
+
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image without model"
+	${RUNSUDO} docker build . -f build/containerfile \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG} \
+		--build-arg USER_ID="$$(id -u)" \
+		--build-arg YOUR_ENV="production"
+
+container-run:
+	@${RUNSUDO} docker run \
+		-v $$(pwd)/../../../env.txt:/app/env.txt:ro \
+		-it \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG}

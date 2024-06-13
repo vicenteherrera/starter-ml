@@ -1,9 +1,13 @@
 import streamlit as st
 import requests
-# from dotenv import load_dotenv
+import os
 
+SERVER_URL = os.getenv("SERVER_URL")
 
-SERVER_URL = "http://127.0.0.1:3000/ask"
+if SERVER_URL == "":
+    SERVER_URL = "http://127.0.0.1:3000/ask"
+
+print("Using SERVER_URL="+SERVER_URL)
 
 # Streamlit header
 st.header("Got a question for me?")
