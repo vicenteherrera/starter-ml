@@ -9,6 +9,13 @@ NETWORK_CALICO="CALICO"
 NETWORK_CILIUM="CILIUM"
 NETWORK=$(NETWORK_DEFAULT)
 
+all: start create-secret
+	kubectl apply -f ./manifests
+	@echo "Expose load balancer running in a terminal:"
+	@echo "minikube tunnel to expose"
+	@echo "Then get the service address in another terminal with:"
+	@echo "kubectl get svc"
+
 start:
 	minikube delete ||:
 	if test "$(NETWORK)" = "$(NETWORK_CALICO)"; then \
