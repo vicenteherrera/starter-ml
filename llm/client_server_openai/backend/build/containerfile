@@ -1,5 +1,5 @@
 
-FROM python:3.11.2
+FROM python:3.11.7
 
 ARG YOUR_ENV
 ENV YOUR_ENV=${YOUR_ENV} \
@@ -14,17 +14,17 @@ ENV YOUR_ENV=${YOUR_ENV} \
 # System deps:
 RUN pip install "poetry==$POETRY_VERSION"
 
-USER 10000
-WORKDIR /code
+USER 1000
+WORKDIR /app
 
 # Copy only requirements to cache them in docker layer
-COPY poetry.lock pyproject.toml /code/
+COPY poetry.lock pyproject.toml /app/
 
 # Project initialization:
 RUN poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
 # Creating folders, and files for a project:
-COPY ./src /code/src
+COPY ./src /app/src
 
 ENV HF_HUB_OFFLINE=1
 ENV HF_HUB_DISABLE_TELEMETRY=1
