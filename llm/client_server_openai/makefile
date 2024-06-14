@@ -33,3 +33,8 @@ container-push:
 	cd backend && make -s container-push
 	cd frontend && make -s container-push
 
+
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+compose-up:
+	${RUNSUDO} docker compose up
