@@ -15,12 +15,12 @@ ENV YOUR_ENV=${YOUR_ENV} \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100
 
-
-COPY ./poetry.out ./poetry.out
-RUN pip install --require-hashes -r ./poetry.out && \
-    rm ./poetry.out && \
-    apt-get install libffi-dev
-
+COPY ./build/base_requirements/ ./base_requirements/
+RUN pip install --require-hashes -r ./base_requirements/poetry.out && \
+    pip install --require-hashes -r ./base_requirements/pyinstaller.out && \
+    pip install --require-hashes -r ./base_requirements/nuitka.out && \
+    rm -r ./base_requirements && \
+    apt-get install libffi-dev libsqlite3-dev
 
 ARG USER_ID
 USER ${USER_ID:-10000}

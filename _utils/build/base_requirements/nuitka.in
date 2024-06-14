@@ -1,0 +1,3 @@
+
+nuitka==2.2.3 \
+  --hash=sha256:aa78f838c2b5d165e2c071e9a9e705b2ac77506d24e91121321fa4b9740bba88
