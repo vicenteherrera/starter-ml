@@ -1,7 +1,5 @@
 
-FROM python:3.11.2
-
-# FROM python:3.6.6-alpine3.7
+FROM python:3.11.7
 
 ARG YOUR_ENV
 ARG YOUR_HOME
