@@ -11,18 +11,21 @@ generate-base-req:
 	@poetry run pip-compile --generate-hashes build/base_requirements/pyinstaller.in -o build/base_requirements/pyinstaller.out
 	@poetry run pip-compile --generate-hashes build/base_requirements/nuitka.in -o build/base_requirements/nuitka.out
 
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
 container-build:
-	docker build . -f build/containerfile_dev -t ${IMAGE_NAME}:${TAG}
+	${RUNSUDO} docker build . -f build/containerfile_dev -t ${IMAGE_NAME}:${TAG}
 
 container-run:
-	docker run -it \
+	${RUNSUDO} docker run -it \
 		-v "$$(pwd)/../":/home/user/starter-ml \
 		-u $$(id -u):$$(id -g) \
 		${IMAGE_NAME}:${TAG}
 
 container-push:
-	docker push ${IMAGE_NAME}:${TAG}
+	${RUNSUDO} docker push ${IMAGE_NAME}:${TAG}
 
 container-pull:
-	docker pull ${IMAGE_NAME}:${TAG}
+	${RUNSUDO} docker pull ${IMAGE_NAME}:${TAG}
 
