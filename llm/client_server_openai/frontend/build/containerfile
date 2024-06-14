@@ -26,22 +26,38 @@ COPY poetry.lock pyproject.toml /build/
 RUN poetry config virtualenvs.create false  && \
   poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
-
 WORKDIR /app
-
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     curl \
-#     software-properties-common \
-#     git \
-#     && rm -rf /var/lib/apt/lists/*
 
 # Copy and compile source into bytecodes
 COPY ./src /app/src
+RUN python -m compileall /app/src
+
+# APP STAGE ---------------------------------------------------------------------------
+# python:3.11.7-slim-bookworm
+FROM python@sha256:53d6284a40eae6b625f22870f5faba6c54f2a28db9027408f4dee111f1e885a2 as app
+
+# Uninstall pip and other package managers and compilers
+RUN pip uninstall -y pip setuptools wheel && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /etc/apt /var/lib/apt /usr/lib/apt /var/cache/apt /var/log/apt
+
+# Copy Python libraries from previous stage
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+
+# Copy streamlit binary
+COPY --from=builder /usr/local/bin/streamlit /usr/local/bin/streamlit
+
+# Make it easy build and mount model on dev machine using same uid for files
+ARG USER_ID
+USER ${USER_ID:-1000}
+
+WORKDIR /app
+
+# Copy Python source code
+COPY --from=builder --chown=${USER_ID:-1000} /app/src /app/src
 
 EXPOSE 8501
 
 # HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 ENTRYPOINT ["streamlit", "run", "./src/frontend.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
