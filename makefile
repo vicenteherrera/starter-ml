@@ -4,8 +4,12 @@ help:
 	@echo "'cd' into each directory and run 'make help'"
 
 size:
-	@echo "Size of libraries"
-	@du -sh /home/mord/.cache/pypoetry/virtualenvs/
+	@echo "Poetry virtualenvs"
+	@du -sh /home/mord/.cache/pypoetry/virtualenvs/ ||:
+	@echo "Poetry cache"
+	@du -sh /home/mord/.cache/pypoetry/cache/ ||:
+		@echo "Poetry artifacts"
+	@du -sh /home/mord/.cache/pypoetry/artifacts/ ||:
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
 	@echo "Local cache models"
