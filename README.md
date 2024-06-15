@@ -20,6 +20,7 @@ Each example has a `README.md` file explaining it. Continue reading down this pa
   * [containerize_model](llm/containerize_model): Create the most secure and slimmest container for a local model.
   * [client_server_openai](llm/client_server_openai): Create a server LLM endpoint for OpenAI, and a client to connect to it using Streamlit chat UI.
   * _security
+    * [pickle](llm/_security/pickle): Shows how pickle binary data format can be insecure.
     * [simple_garak](llm/_security/simple_garak): Scan OpenAI and local models with Garak vuln analysis.
     * [llm_guard_openai](llm/_security/llm_guard_openai): Test LLM Guard mitigation with OpenAI endpoint.
     * [terrapin](llm/_security/terrapin): Model attestation using Terrapin.
