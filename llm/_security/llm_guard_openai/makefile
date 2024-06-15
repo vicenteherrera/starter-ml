@@ -116,3 +116,33 @@ size:
 vulnerability-scan:
 	trivy filesystem poetry.lock --scanners vuln
 
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker build . -f build/containerfile_dev \
+		--build-arg DIR=${DIR} \
+		--build-arg USER_ID="$$(id -u)" \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+	${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-run: config_exists
+	@echo "Running container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker run -it \
+		-v "$$(pwd)/${CONFIG_FILE}":/home/user/"$$(basename $$(pwd))"/env.txt \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG} bash -c "cd ${DIR} && make help && /bin/bash"
+
+container-run-dev:
+	@echo "Running container image with local dir mounted ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker run \
+		-v "$$(pwd)":/home/user/"$$(basename $$(pwd))" \
+		-u $$(id -u):$$(id -g) \
+		-it \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-push:
+	@echo "Pushing container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}
