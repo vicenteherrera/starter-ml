@@ -29,7 +29,7 @@ RUN pip install --require-hashes -r ./base_requirements/poetry.out && \
 # #     git
 
 ARG USER_ID
-USER ${USER_ID:-1000}
+USER ${USER_ID:-10000}
 
 ENV HOME="/home/user"
 WORKDIR ${HOME}

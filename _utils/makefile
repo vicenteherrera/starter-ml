@@ -15,7 +15,9 @@ generate-base-req:
 RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
 
 container-build:
-	${RUNSUDO} docker build . -f build/containerfile_dev -t ${IMAGE_NAME}:${TAG}
+	${RUNSUDO} docker build . -f build/containerfile_dev \
+	--build-arg USER_ID="$$(id -u)" \
+	-t ${IMAGE_NAME}:${TAG}
 
 container-run:
 	${RUNSUDO} docker run -it \
