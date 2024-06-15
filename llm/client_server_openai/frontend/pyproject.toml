@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gradio_openai"
+name = "frontend_streamlit"
 version = "0.1.0"
 description = ""
 authors = ["Vicente Herrera <vicenteherrera@vicenteherrera.com>"]

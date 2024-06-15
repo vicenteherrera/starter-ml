@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "openai_backend"
+name = "backend_openai_rag"
 version = "0.1.0"
 description = ""
 authors = ["Vicente Herrera <vicenteherrera@vicenteherrera.com>"]
