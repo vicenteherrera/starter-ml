@@ -25,6 +25,15 @@ help:
 	@echo "# Examine compromised pickle file without loading or running"
 	@echo "make run-pickletools"
 	@echo ""
+	@echo "# Create a pickle file for a ML model"
+	@echo "make run-save-model"
+	@echo ""
+	@echo "# Load a picle file for a ML model"
+	@echo "make run-load-model"
+	@echo ""
+	@echo "# Modify existing pickle file to add arbitrary code execution"
+	@echo "make run-modify-model run-load-model"
+	@echo ""
 
 run-pickletools:
 	poetry run python -m pickletools data/compromise.bin
@@ -47,6 +56,9 @@ run-save-pandas:
 run-save-model:
 	poetry run python ./src/save-model.py
 	ls data -la
+
+run-modify-model:
+	poetry run python ./src/modify-model.py
 
 run-load-array:
 	poetry run python ./src/load.py
