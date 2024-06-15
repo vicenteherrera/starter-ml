@@ -8,18 +8,23 @@ size:
 	@du -sh /home/mord/.cache/pypoetry/virtualenvs/ ||:
 	@echo "Poetry cache"
 	@du -sh /home/mord/.cache/pypoetry/cache/ ||:
-		@echo "Poetry artifacts"
+	@echo "Poetry artifacts"
 	@du -sh /home/mord/.cache/pypoetry/artifacts/ ||:
+	@echo "Global Huggingface cache models"
+	@du -sh $$HOME/.cache/huggingface/hub ||:
+	@echo "Local Huggingface cache models"
+	@find . -name .cache -type d -exec du -sh {} +
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
-	@echo "Local cache models"
-	@find . -name .cache -type d -exec du -sh {} \;
 
 delete:
-	@echo "Delete all virtual environment, devpi cache, and global and all local .cache folders"
+	@echo "Delete caches:"
+	@echo "Poetry virtualenvs"
+	@du -sh /home/mord/.cache/pypoetry/virtualenvs/ ||:
+	@echo "Local Huggingface cache models"
+	@find . -name .cache -type d -exec du -sh {} +
 	@echo "Press enter to continue, control+c to abort"
 	@read dummy_var
-	@echo "Removing cache folders"
+	@echo "Removing cache directories"
 	@rm -r /home/mord/.cache/pypoetry/virtualenvs/ ||:
-	@rm -r $$HOME/.devpi/server ||:
-	@find . -name .cache -type d -exec rm -r {} \;
+	@find . -name '.cache' -type d -exec rm -r {} +
