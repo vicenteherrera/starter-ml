@@ -1,4 +1,4 @@
-FROM quay.io/vicenteherrera/python-dev-shell@sha256:053ea30835edfccfb17000ccc45121da4b02abece614627b0e499ea67ea61238
+FROM quay.io/vicenteherrera/python-dev-shell:3.11.7
 
 ARG USER_ID
 USER ${USER_ID:-10000}
