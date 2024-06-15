@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
+
+
 # Using poetry
 
 all: requirements install_python install help
@@ -12,13 +15,13 @@ help:
 	@echo "Evaluate 'Do Anything Now' probes on OpenAI GPT-3.5-turbo:"
 	@echo "make run-oa-gpt3.5-turbo"
 
-run-hg-gpt2:
-	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+run-hg-gpt2: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
 	poetry run garak --model_type huggingface --model_name gpt2 --probes dan
 
-run-oa-gpt3.5-turbo:
-	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+run-oa-gpt3.5-turbo: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
 	poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan
 
@@ -30,13 +33,13 @@ list-probes:
 install_garak:
 	pipx install garak
 
-garak-hg-gpt2:
-	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+garak-hg-gpt2: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
 	garak --model_type huggingface --model_name gpt2 --probes dan
 
-garak-oa-gpt3.5-turbo:
-	source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+garak-oa-gpt3.5-turbo: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
 	garak --model_type openai --model_name gpt-3.5-turbo --probes dan
 
@@ -46,6 +49,10 @@ garak-oa-gpt3.5-turbo:
 requirements:
 	which pyenv
 	which poetry
+
+config_exists:
+	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
+	@echo "Config file found at ${CONFIG_FILE}"
 
 install_python: upgrade_pyenv
 	pyenv install $$(cat .python-version) -s

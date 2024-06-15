@@ -75,17 +75,19 @@ size:
 RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
 
 container-build:
-	@echo "Building container image without model"
+	@echo "Building container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
 	${RUNSUDO} docker build . -f build/containerfile \
 		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG} \
 		--build-arg USER_ID="$$(id -u)" \
 		--build-arg YOUR_ENV="production"
 
 container-run:
-	@${RUNSUDO} docker run \
+	@echo "Running container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker run \
 		-v $$(pwd)/../../../env.txt:/app/config/env.txt:ro \
 		-it \
 		${CONTAINER_IMAGE}:${CONTAINER_TAG}
 
 container-push:
+	@echo "Pushing container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
 	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}

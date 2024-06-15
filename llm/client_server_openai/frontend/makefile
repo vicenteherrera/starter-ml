@@ -9,7 +9,6 @@ run: run_frontend
 
 run_frontend:
 	@echo "Execute also server on another terminal with: cd ../backend && make run"
-	@source "$$(for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt" "../../../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
 	poetry run streamlit run ./src/frontend.py
 
 code:

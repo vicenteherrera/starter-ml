@@ -1,7 +1,8 @@
+SHELL := /bin/bash
 
 all: requirements install_python install run size
 
-run:
+run: config_exists
 	poetry run python ./src/app.py
 
 code:
@@ -12,6 +13,11 @@ code:
 requirements:
 	which pyenv
 	which poetry
+
+config_exists:
+	@CONFIG_FILE=$$(for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "") && \
+	[ -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
+	@echo "Config file found at ${CONFIG_FILE}"
 
 install_python: upgrade_pyenv
 	pyenv install $$(cat .python-version) -s

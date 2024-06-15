@@ -4,6 +4,8 @@ MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
 MODEL_EXT=*.safetensors
 REVISION=main
 
+CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
+
 all: requirements install_python install required_python download run size
 
 code:
@@ -13,7 +15,8 @@ code:
 
 run: run-offline-local
 
-run-online-local:
+run-online-local: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./src/app.py
@@ -28,15 +31,15 @@ run-offline-local:
 
 download: download-local
 
-download-local:
-	source "$$(for p in "env.txt" "../env.txt" "../../env.txt"; do [[ -f "$p" ]] && echo "$$p" && break; done || echo "/dev/null")" && \
+download-local: config_exists
+	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface/' \
 	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
 		"${MODEL}" \
 		--revision "${REVISION}" \
 		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
 
-download-local-py:
+download-local-py: config_exists
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./build/model_download.py
@@ -46,6 +49,10 @@ download-local-py:
 requirements:
 	which pyenv
 	which poetry
+
+config_exists:
+	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
+	@echo "Config file found at ${CONFIG_FILE}"
 
 install_python: upgrade_pyenv
 	pyenv install $$(cat .python-version) -s
