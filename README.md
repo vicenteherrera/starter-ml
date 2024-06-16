@@ -41,11 +41,11 @@ You have the alternative to use a container image to navigate and test the examp
 
 ## API Keys:
 
-Some examples download models from Huggingface, if you create a free account and [setup an API key token](https://huggingface.co/docs/hub/en/security-tokens), you will ensure you are not throttled when doing so.
+Some examples download models from Huggingface, if you create a free account and [set up an API key token](https://huggingface.co/docs/hub/en/security-tokens), you will ensure you are not throttled when doing so.
 
-Other examples require a paid [OpenAI](https://platform.openai.com/account/api-keys) API key, make sure you have introduced your payment methond with them, and have bought some initial credits.
+Other examples require a paid [OpenAI](https://platform.openai.com/account/api-keys) API key, make sure you have introduced your payment method with them, and have bought some initial credits.
 
-Copy `sample-env.txt` to `env.txt` and put your API keys there. You could do that on individual examples, or globaly with a `env.txt` file on the parent directory where you put all your API keys. Although the file specifies variables prefixing them with `export`, when possible most of the example don't load them into the environment, but process the file and picks the value to be passed to corresponding function calls.
+Copy `sample-env.txt` to `env.txt` and put your API keys there. You could do that on individual examples, or globally with an `env.txt` file on the parent directory where you put all your API keys. Although the file specifies variables prefixing them with `export`, when possible most of the examples don't load them into the environment, but process the file and pick the value to be passed to corresponding function calls.
 
 ## Running examples
 
@@ -69,7 +69,7 @@ ModuleNotFoundError: No module named '_ctypes'
 ```
 * You have to install `libffi-devel` before installing the specific python version
   `sudo apt-get install libffi-dev`  
-* Reinstall after that the PyEnv Python version in the project folder with:
+* Reinstall afterwards the PyEnv Python version in the project folder with:
 
 ```bash
 pyenv uninstall $(cat .python-version)
