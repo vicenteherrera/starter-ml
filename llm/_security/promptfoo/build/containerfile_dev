@@ -1,0 +1,13 @@
+FROM node:22.3.0-bookworm
+RUN apt-get update && apt-get -y install make
+
+WORKDIR /home/promptfoo
+COPY . /home/promptfoo/
+
+RUN make install_promptfoo
+
+RUN --mount=type=secret,id=OPENAI_API_KEY \
+  export OPENAI_API_KEY=$(cat /run/secrets/OPENAI_API_KEY) && \
+  cd data && promptfoo eval ||:
+
+CMD /bin/bash
