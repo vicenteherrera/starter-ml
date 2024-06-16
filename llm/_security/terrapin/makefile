@@ -36,7 +36,7 @@ clone-build-terrapin:
 	rm -rf ./terrapin-go
 	git clone --depth 1 https://github.com/fkautz/terrapin-go.git
 	cd terrapin-go && git fetch --depth 1 origin d97e69f43a2170e42cb7b79671111d65bc53bf13
-	cd terrapin-go && git checkout d97e69f43a2170e42cb7b79671111d65bc53bf13
+	cd terrapin-go && git -c advice.detachedHead=false checkout d97e69f43a2170e42cb7b79671111d65bc53bf13
 	cd terrapin-go && go build -o ../terrapin ./cmd/terrapin
 	rm -rf ./terrapin-go
 
