@@ -1,0 +1,17 @@
+FROM quay.io/vicenteherrera/python-dev-shell:3.11.7
+
+ARG USER_ID
+USER ${USER_ID:-10000}
+ENV HOME="/home/user"
+WORKDIR ${HOME}
+
+ARG DIR
+COPY --chown=${USER_ID:-10000} . ./${DIR:-app}
+
+# Install go
+RUN wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz && \
+  rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz && \
+  rm go1.22.4.linux-amd64.tar.gz && \
+  echo 'export PATH=$PATH:/usr/local/go/bin' >>.bashrc
+
+RUN export PATH=$PATH:/usr/local/go/bin && cd ${DIR:-app} && make

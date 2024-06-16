@@ -10,10 +10,35 @@ MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
 MODEL_EXT=*.safetensors
 REVISION=main
 
-all: requirements install_python install required_python download run-offline-local size
+DIR=$(shell basename $$(pwd))
+CONTAINER_IMAGE=quay.io/vicenteherrera/python-dev-shell
+CONTAINER_TAG=3.11.7-${DIR}
+
+CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
+
+all: requirements install_python install required_python download clone-build-terrapin size help
+
+help:
+	@echo ""
+	@echo "HELP"
+	@echo ""
+	@echo "# Create attestation digest file"
+	@echo "make run-create-terrapin-attest"
+	@echo ""
+	@echo "# Validate attestation digest file"
+	@echo "make run-validate-terrapin-attest"
+	@echo ""
 
 code:
 	poetry run code .
+
+clone-build-terrapin:
+	rm -rf ./terrapin-go
+	git clone --depth 1 https://github.com/fkautz/terrapin-go.git
+	cd terrapin-go && git fetch --depth 1 origin d97e69f43a2170e42cb7b79671111d65bc53bf13
+	cd terrapin-go && git checkout d97e69f43a2170e42cb7b79671111d65bc53bf13
+	cd terrapin-go && go build -o ../terrapin ./cmd/terrapin
+	rm -rf ./terrapin-go
 
 # run ----------------------------------------------------------------
 
@@ -25,12 +50,27 @@ run-offline-local:
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./src/app.py
 
+# Set model main file as an example, you should loop through all files
+MODEL_FILE=.cache/huggingface/hub/models--TinyLlama--TinyLlama-1.1B-Chat-v1.0/snapshots/fe8a4ea1ffedaf415f4da2f062534de366a451e6/model.safetensors
+
+run-create-terrapin-attest:
+	@echo "Creating attestation for ${MODEL_FILE}"
+	./terrapin attest \
+			-input "${MODEL_FILE}" \
+			-output attestations/model.safetensors.attestation
+
+run-validate-terrapin-attest:
+	@echo "Validating attestation for ${MODEL_FILE}"
+	./terrapin validate \
+    -input "${MODEL_FILE}" -attestations \
+    attestations/model.safetensors.attestation
+
 # download ----------------------------------------------------------------
 
 download: download-local-py
 
 download-local:
-	source env.txt && \
+	source "${CONFIG_FILE}" ||: && \
 	HF_HOME='./.cache/huggingface/' \
 	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
 		"${MODEL}" \
@@ -38,22 +78,21 @@ download-local:
 		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
 
 download-local-py:
-	source env.txt && \
+	source "${CONFIG_FILE}" ||: && \
 	HF_HOME='./.cache/huggingface/' \
 	MODEL="${MODEL}" REVISION="${REVISION}" \
 	poetry run python ./build/model_download.py
-
-# Generate requirements hashes and compile -----------------------------------------
-
-compile:
-	@mkdir -p bin && cd bin  && \
-	time poetry run pyinstaller --onefile pyinstaller ../src/app.py
 
 # requirements ----------------------------------------------------------------
 
 requirements:
 	which pyenv
 	which poetry
+	which go
+
+config_exists:
+	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
+	@echo "Config file found at ${CONFIG_FILE}"
 
 install_python: upgrade_pyenv
 	pyenv install $$(cat .python-version) -s
@@ -104,13 +143,16 @@ show:
 info:
 	poetry run poetry env info -p
 
-delete: delete_venv delete_local_huggingface delete_bin
+delete: delete_venv delete_local_huggingface delete_terrapin
 
 delete_venv:
 	poetry env remove --all ||:
 
 delete_local_huggingface:
 	rm -r ./.cache/huggingface/hub ||:
+
+delete_terrapin:
+	rm -rf ./terrapin-go
 
 size:
 	@echo "Size of libraries"
@@ -119,7 +161,36 @@ size:
 	@du -sh ./bin/ ||:
 	@echo "Size of models in ./.cache/huggingface/"
 	@du -sh ./.cache/huggingface/ ||:
-	@echo "Size of devpi cache"
-	@du -sh $$HOME/.devpi/server ||:
-	@echo "Container images"
-	@${RUNSUDO} docker image ls
+
+
+
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker build . -f build/containerfile_dev \
+		--build-arg DIR=${DIR} \
+		--build-arg USER_ID="$$(id -u)" \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+	${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-run: config_exists
+	@echo "Running container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	@${RUNSUDO} docker run -it \
+		-v "$$(pwd)/${CONFIG_FILE}":/home/user/"$$(basename $$(pwd))"/env.txt \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG} bash -c "cd ${DIR} && make help && /bin/bash"
+
+container-run-dev:
+	@echo "Running container image with local dir mounted ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	@${RUNSUDO} docker run \
+		-v "$$(pwd)":/home/user/"$$(basename $$(pwd))" \
+		-u $$(id -u):$$(id -g) \
+		-it \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-push:
+	@echo "Pushing container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}
