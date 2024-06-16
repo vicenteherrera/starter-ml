@@ -3,21 +3,14 @@ FROM python:3.11.7
 
 WORKDIR /app
 
-ARG MODEL
-ARG REVISION
-ARG MODEL_EXT
-ENV MODEL="${MODEL}"
-ENV REVISION="${REVISION}"
+ARG MODEL_DIR
+ENV MODEL_DIR="${MODEL_DIR}"
 
 # Download cache of models and datasets
 RUN pip install -U "huggingface_hub[cli]"
 ENV HF_HOME="/app/.cache/huggingface/"
 
-RUN --mount=type=secret,id=hf_token \
-	huggingface-cli download --token=$(cat /run/secrets/hf_token) \
-		"${MODEL}" \
-		--revision "${REVISION}" \
-		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
+RUN make download
 
 # App specific stuff
 

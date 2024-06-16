@@ -6,10 +6,9 @@ import os
 
 def __main__():
 
-  model_name = os.environ["MODEL"]
-  model_revision = os.environ["REVISION"]
+  model_dir = os.environ["MODEL_DIR"]
 
-  print("# Executing model '" + model_name + "' revision '" + model_revision + "'")
+  print("# Executing model '" + model_dir)
 
   start_time = time.time()
 
@@ -19,14 +18,16 @@ def __main__():
       for i in range(torch.cuda.device_count()):
         print(f"CUDA GPU {i}: {torch.cuda.get_device_name(i)}")
 
-  tokenizer = AutoTokenizer.from_pretrained(model_name, revision=model_revision)
+  # tokenizer = AutoTokenizer.from_pretrained(model_name, revision=model_revision)
+  tokenizer = AutoTokenizer.from_pretrained(model_dir, from_pt=True)
+  
 
-  print("Loading model:", model_name)
+  print("Loading model:", model_dir)
   loading_time = time.time()
   dtype = torch.float16 if torch.cuda.is_available() else torch.float32 
   pipeline = transformers.pipeline(
-    "text-generation", model=model_name, revision=model_revision,
-    torch_dtype=dtype, device_map="auto",
+    "text-generation", model=model_dir,
+    torch_dtype=dtype, device_map="auto", truncation=True
   )
   print('Model loaded in:', (time.time() - loading_time), 'seconds')
 

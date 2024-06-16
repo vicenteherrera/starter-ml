@@ -6,72 +6,78 @@ SHELL := /bin/bash
 # MODEL_EXT=*.bin
 # REVISION=refs/pr/1
 
+#  "stabilityai/stable-diffusion-2-1", revision="refs/pr/22", use_safetensors=True
+
 MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
-MODEL_EXT=*.safetensors
-REVISION=main
+COMMIT=ce0c99637bf2aba3265ec4675b50eadb26ac5a21
+MODEL_DIR=./.cache/huggingface/hub/${MODEL}
 
 CONTAINER_IMAGE=quay.io/vicenteherrera/llm-test
 
 CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
 
 
-all: requirements install_python install required_python download run-offline-local size
+all: requirements install_python install required_python download size
+
+help:
+	@echo ""
+	@echo "HELP"
+	@echo ""
+	@echo "# Prepare local requirements"
+	@echo "make"
+	@echo ""
+	@echo "# Run model locally"
+	@echo ""
+	@echo "make run"
+	@echo ""
+	@echo "# Run container with code, mount local folder with model"
+	@echo "make container-run-no-model"
+	@echo ""
+
 
 code:
 	poetry run code .
 
 # run ----------------------------------------------------------------
 
-run: run-offline
-
-run-online-local: config_exists
-	source "${CONFIG_FILE}" && \
-	HF_HOME='./.cache/huggingface/' \
-	MODEL="${MODEL}" REVISION="${REVISION}" \
-	poetry run python ./src/app.py
-
-run-offline-home:
-	HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
-	HF_HOME="$$HOME/.cache/huggingface/" \
-	MODEL="${MODEL}" REVISION="${REVISION}" \
-	poetry run python ./src/app.py
+run: run-offline-local
 
 run-offline-local:
 	HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
 	HF_HOME='./.cache/huggingface/' \
-	MODEL="${MODEL}" REVISION="${REVISION}" \
+	MODEL_DIR="${MODEL_DIR}" \
 	poetry run python ./src/app.py
 
 run-offline-local-bin:
 	HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
 	HF_HOME='./.cache/huggingface/' \
-	MODEL="${MODEL}" REVISION="${REVISION}" \
+	MODEL_DIR="${MODEL_DIR}" \
 	./bin/dist/app
 
 # download ----------------------------------------------------------------
 
-download: download-local
+download: download-local-git-https
 
-download-local: config_exists
-	source "${CONFIG_FILE}" && \
-	HF_HOME='./.cache/huggingface/' \
-	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
-		"${MODEL}" \
-		--revision "${REVISION}" \
-		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
+download-local-git-ssh: config_exists
+	@make -s git-prepare
+	git clone --depth 1 git@hf.co:${MODEL} "${MODEL_DIR}"
+	@make -s git-finish
 
-download-local-py: config_exists
-	HF_HOME='./.cache/huggingface/' \
-	MODEL="${MODEL}" REVISION="${REVISION}" \
-	poetry run python ./build/model_download.py
+download-local-git-https: config_exists
+	@make -s git-prepare
+	git clone --depth 1 https://huggingface.co/${MODEL} "${MODEL_DIR}"
+	@make -s git-finish
 
-download-home: config_exists
-	source "${CONFIG_FILE}" && \
-	HF_HOME="$$HOME/.cache/huggingface/" && \
-	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
-		"${MODEL}" \
-		--revision "${REVISION}" \
-		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
+git-prepare: config_exists
+	@echo "Cloning ${MODEL} commit ${COMMIT}"
+	git lfs install
+	rm -rf "${MODEL_DIR}"
+
+git-finish:
+	cd "${MODEL_DIR}" && \
+	git fetch --depth 1 origin "${COMMIT}" && \
+	git -c advice.detachedHead=false checkout "${COMMIT}"
+	rm -rf "${MODEL_DIR}"/.git
 
 # Generate requirements hashes and compile -----------------------------------------
 
@@ -195,93 +201,83 @@ container-validate-base:
 
 # Build container without model
 container-build-no-model:
-	@echo "Building container image without model"
-	@source ./env.txt && \
+	@echo "Building container image without model ${CONTAINER_IMAGE}:no-model"
 	${RUNSUDO} docker build . -f build/containerfile_no_model \
 		-t ${CONTAINER_IMAGE}:no-model \
 		--build-arg USER_ID="$$(id -u)" \
-		--build-arg YOUR_ENV="production" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}
+		--build-arg YOUR_ENV="production"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model
+
+container-push-no-model:
+	@echo "Pushing ${CONTAINER_IMAGE}:no-model"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model
 
 container-build-no-model-bin:
-	@echo "Building container image without model with compilation"
-	@source ./env.txt && \
+	@echo "Building container image without model compiling binary ${CONTAINER_IMAGE}:no-model-bin"
 	${RUNSUDO} docker build . -f build/containerfile_no_model_bin \
-		-t ${CONTAINER_IMAGE}:no-model \
+		-t ${CONTAINER_IMAGE}:no-model-bin \
 		--build-arg USER_ID="$$(id -u)" \
-		--build-arg YOUR_ENV="production" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}
+		--build-arg YOUR_ENV="production"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model-bin
+
+container-push-no-model-bin:
+	@echo "Pushing ${CONTAINER_IMAGE}:no-model-bin"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model-bin
 
 container-run-no-model:
-	${RUNSUDO} docker run -it ${CONTAINER_IMAGE}:no-model
-
-container-run-no-model-volume:
 	@PROJ_HOME=$$PWD  && \
 	${RUNSUDO} docker run -it \
 		-v "$$PROJ_HOME/.cache":/app/.cache:ro \
+		-e MODEL_DIR="${MODEL_DIR}" \
 		-u $$(id -u):$$(id -g) \
 		${CONTAINER_IMAGE}:no-model
+
+container-run-no-model-bin:
+	@PROJ_HOME=$$PWD  && \
+	${RUNSUDO} docker run -it \
+		-v "$$PROJ_HOME/.cache":/app/.cache:ro \
+		-e MODEL_DIR="${MODEL_DIR}" \
+		-u $$(id -u):$$(id -g) \
+		${CONTAINER_IMAGE}:no-model-bin
+
 # We need to change the container user to have access to the mounted files
 # If using an independent volume, this shouldn't be a problem	
 # https://forums.docker.com/t/we-cant-push-a-docker-volume-so-now-what/56160/2
 
-
-
 # Copy or download the model inside the container ------------------------------------
 
-# Build container by copying model from home cache folder
-container-build-copy-home: download-home
-	@echo "Building container image"
-	@${RUNSUDO} docker buildx build . -f build/containerfile_copy -t ${CONTAINER_IMAGE} \
-		--build-context huggingface="$$HOME/.cache/huggingface" \
-		--build-arg HF_HOME_LOCAL="$$HOME/.cache/huggingface" \
-		--build-arg YOUR_ENV="production" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}"
-# If you do this, you may end up copying extra models unless you first delete HG cache.
-# You need buildx to be able to copy files outside current directory.
-# https://docs.docker.com/engine/install/debian/#install-using-the-repository
-
 # Build container by copying model from local folder
-container-build-copy-local: download-local
-	@echo "Building container image"
-	@source ./env.txt && \
-	${RUNSUDO} docker build . -f build/containerfile_copy -t ${CONTAINER_IMAGE} \
+container-build-copy: download
+	@echo "Building container image copying model ${CONTAINER_IMAGE}:model-copy"
+	${RUNSUDO} docker build . -f build/containerfile_copy -t ${CONTAINER_IMAGE}:model-copy \
 		--build-arg HF_HOME_LOCAL="$$HF_HOME" \
 		--build-arg YOUR_ENV="production" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}"
+		--build-arg MODEL_DIR="${MODEL_DIR}"
 
-# Build container by downloading model inside it with huggingface-cli
+# Build container by downloading model inside it
 container-build-download:
-	@echo "Building container image"
+	@echo "Building container image that downloads model inside ${CONTAINER_IMAGE}:model-copy"
 	@source ./env.txt && \
-	${RUNSUDO} docker build . -f build/containerfile_download -t ${CONTAINER_IMAGE} \
+	${RUNSUDO} docker build . -f build/containerfile_download -t ${CONTAINER_IMAGE}:model-copy \
 		--secret id=hf_token,env=HUGGINGFACE_TOKEN \
 		--build-arg YOUR_HOME="$$HOME" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}" \
-		--build-arg MODEL_EXT="${MODEL_EXT}"
-
-# Build container by downloading model inside it with python code
-container-build-download-py:
-	@echo "Building container image"
-	@source ./env.txt && \
-	${RUNSUDO} docker build . -f build/containerfile_download_py -t ${CONTAINER_IMAGE} \
-		--secret id=hf_token,env=HUGGINGFACE_TOKEN \
-		--build-arg YOUR_HOME="$$HOME" \
-		--build-arg MODEL="${MODEL}" \
-		--build-arg REVISION="${REVISION}" \
-		--build-arg MODEL_EXT="${MODEL_EXT}"
+		--build-arg MODEL_DIR="${MODEL_DIR}:model-copy"
 
 # Run container with model
-container-run:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}
+container-run-copy-download:
+	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}:model-download
 
+# Run container with model
+container-run-copy:
+	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}:model-copy
+
+container-push-copy:
+	@echo "Pushing ${CONTAINER_IMAGE}:model-copy"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:model-copy
+
+container-push-download:
+	@echo "Pushing ${CONTAINER_IMAGE}:model-download"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:model-download
 
 # Test container builds -------------------------------------------------
 
@@ -289,8 +285,7 @@ container-run:
 test-container: test-dummy-sudo test-container-build-no-model test-container-build-copy-home test-container-build-copy-local test-container-build-download test-container-build-download-py
 test-dummy-sudo:
 	@${RUNSUDO} ls
-test-container-build-copy-home: delete_huggingface download-home container-build-copy-home container-run
-test-container-build-copy-local: delete_local_huggingface download-local container-build-copy-local container-run
-test-container-build-download: container-build-download container-run
-test-container-build-download-py: container-build-download-py container-run
-test-container-build-no-model: delete_local_huggingface download-local container-build-no-model container-run-no-model-volume
+test-container-build-copy: download container-build-copy container-run-copy
+test-container-build-download: container-build-download container-run-download
+test-container-build-no-model: download container-build-no-model container-run-no-model
+test-container-build-no-model-bin: download container-build-no-model-bin container-run-no-model-bin
