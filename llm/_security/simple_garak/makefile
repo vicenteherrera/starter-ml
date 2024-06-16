@@ -1,24 +1,35 @@
 SHELL := /bin/bash
 
+# MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
+MODEL=gpt2
+MODEL_EXT=*.safetensors
+REVISION=main
+
+DIR=$(shell basename $$(pwd))
+CONTAINER_IMAGE=quay.io/vicenteherrera/python-dev-shell
+CONTAINER_TAG=3.11.7-${DIR}
+
 CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
 
-
-# Using poetry
-
-all: requirements install_python install help
+all: requirements install_python install required_python download help
 
 help:
 	@echo ""
 	@echo "HELP"
-	@echo "Evaluate 'Do Anything Now' probes on local GPT2 open source model from Huggingface:"
-	@echo "make run-hg-gpt2"
-	@echo "Evaluate 'Do Anything Now' probes on OpenAI GPT-3.5-turbo:"
+	@echo ""
+	@echo "# Evaluate 'Do Anything Now' probes"
+	@echo ""
+	@echo "# On local open source model ${MODEL} from Huggingface:"
+	@echo "make run-hg"
+	@echo ""
+	@echo "# On OpenAI GPT-3.5-turbo:"
 	@echo "make run-oa-gpt3.5-turbo"
+	@echo ""
 
-run-hg-gpt2: config_exists
+run-hg: config_exists
 	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
-	poetry run garak --model_type huggingface --model_name gpt2 --probes dan
+	poetry run garak --model_type huggingface --model_name ${MODEL} --probes dan
 
 run-oa-gpt3.5-turbo: config_exists
 	source "${CONFIG_FILE}" && \
@@ -28,21 +39,15 @@ run-oa-gpt3.5-turbo: config_exists
 list-probes:
 	poetry run garak --list_probes
 
-# Using pipx
+download: download-local
 
-install_garak:
-	pipx install garak
-
-garak-hg-gpt2: config_exists
+download-local: config_exists
 	source "${CONFIG_FILE}" && \
-	HF_HOME='./.cache/huggingface' \
-	garak --model_type huggingface --model_name gpt2 --probes dan
-
-garak-oa-gpt3.5-turbo: config_exists
-	source "${CONFIG_FILE}" && \
-	HF_HOME='./.cache/huggingface' \
-	garak --model_type openai --model_name gpt-3.5-turbo --probes dan
-
+	HF_HOME='./.cache/huggingface/' \
+	poetry run huggingface-cli download --token=$$HUGGINGFACE_TOKEN \
+		"${MODEL}" \
+		--revision "${REVISION}" \
+		--include "${MODEL_EXT}" "*.json" "tokenizer.model" "*.txt"
 
 # requirements ----------------------------------------------------------------
 
@@ -108,3 +113,33 @@ size:
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
 
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker build . -f build/containerfile_dev \
+		--build-arg DIR=${DIR} \
+		--build-arg USER_ID="$$(id -u)" \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+	${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-run: config_exists
+	@echo "Running container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	@${RUNSUDO} docker run -it \
+		-v "$$(pwd)/${CONFIG_FILE}":/home/user/"$$(basename $$(pwd))"/env.txt \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG} bash -c "cd ${DIR} && make help && /bin/bash"
+
+container-run-dev:
+	@echo "Running container image with local dir mounted ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	@${RUNSUDO} docker run \
+		-v "$$(pwd)":/home/user/"$$(basename $$(pwd))" \
+		-u $$(id -u):$$(id -g) \
+		-it \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-push:
+	@echo "Pushing container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}
