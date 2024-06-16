@@ -10,8 +10,6 @@ ENV MODEL_DIR="${MODEL_DIR}"
 RUN pip install -U "huggingface_hub[cli]"
 ENV HF_HOME="/app/.cache/huggingface/"
 
-RUN make download
-
 # App specific stuff
 
 ARG YOUR_ENV
@@ -33,7 +31,13 @@ COPY poetry.lock pyproject.toml /app/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false \
-  && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
+  && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi --no-root
+
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+  apt-get install git-lfs
+
+COPY makefile makefile
+RUN make download
 
 # Creating folders, and files for a project:
 COPY ./src /app/src

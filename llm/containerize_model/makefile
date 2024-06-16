@@ -63,12 +63,12 @@ download-local-git-ssh: config_exists
 	git clone --depth 1 git@hf.co:${MODEL} "${MODEL_DIR}"
 	@make -s git-finish
 
-download-local-git-https: config_exists
+download-local-git-https:
 	@make -s git-prepare
 	git clone --depth 1 https://huggingface.co/${MODEL} "${MODEL_DIR}"
 	@make -s git-finish
 
-git-prepare: config_exists
+git-prepare:
 	@echo "Cloning ${MODEL} commit ${COMMIT}"
 	git lfs install
 	rm -rf "${MODEL_DIR}"
@@ -202,7 +202,8 @@ container-validate-base:
 # Build container without model
 container-build-no-model:
 	@echo "Building container image without model ${CONTAINER_IMAGE}:no-model"
-	${RUNSUDO} docker build . -f build/containerfile_no_model \
+	${RUNSUDO} docker buildx build . -f build/containerfile_no_model \
+	 	--sbom=true --provenance=true \
 		-t ${CONTAINER_IMAGE}:no-model \
 		--build-arg USER_ID="$$(id -u)" \
 		--build-arg YOUR_ENV="production"
@@ -210,11 +211,12 @@ container-build-no-model:
 
 container-push-no-model:
 	@echo "Pushing ${CONTAINER_IMAGE}:no-model"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model
+	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:no-model
 
 container-build-no-model-bin:
 	@echo "Building container image without model compiling binary ${CONTAINER_IMAGE}:no-model-bin"
-	${RUNSUDO} docker build . -f build/containerfile_no_model_bin \
+	${RUNSUDO} docker buildx build . -f build/containerfile_no_model_bin \
+		--sbom=true --provenance=true \
 		-t ${CONTAINER_IMAGE}:no-model-bin \
 		--build-arg USER_ID="$$(id -u)" \
 		--build-arg YOUR_ENV="production"
@@ -222,7 +224,7 @@ container-build-no-model-bin:
 
 container-push-no-model-bin:
 	@echo "Pushing ${CONTAINER_IMAGE}:no-model-bin"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model-bin
+	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:no-model-bin
 
 container-run-no-model:
 	@PROJ_HOME=$$PWD  && \
@@ -247,45 +249,45 @@ container-run-no-model-bin:
 # Copy or download the model inside the container ------------------------------------
 
 # Build container by copying model from local folder
-container-build-copy: download
+container-build-copy:
 	@echo "Building container image copying model ${CONTAINER_IMAGE}:model-copy"
-	${RUNSUDO} docker build . -f build/containerfile_copy -t ${CONTAINER_IMAGE}:model-copy \
-		--build-arg HF_HOME_LOCAL="$$HF_HOME" \
+	@${RUNSUDO} docker build . -f build/containerfile_copy -t ${CONTAINER_IMAGE}:model-copy \
+		--build-arg HF_HOME_LOCAL='./.cache/huggingface/' \
 		--build-arg YOUR_ENV="production" \
 		--build-arg MODEL_DIR="${MODEL_DIR}"
 
-# Build container by downloading model inside it
-container-build-download:
-	@echo "Building container image that downloads model inside ${CONTAINER_IMAGE}:model-copy"
-	@source ./env.txt && \
-	${RUNSUDO} docker build . -f build/containerfile_download -t ${CONTAINER_IMAGE}:model-copy \
-		--secret id=hf_token,env=HUGGINGFACE_TOKEN \
-		--build-arg YOUR_HOME="$$HOME" \
-		--build-arg MODEL_DIR="${MODEL_DIR}:model-copy"
-
-# Run container with model
-container-run-copy-download:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}:model-download
-
 # Run container with model
 container-run-copy:
-	@${RUNSUDO} docker run -i -t ${CONTAINER_IMAGE}:model-copy
+	${RUNSUDO} docker run -it ${CONTAINER_IMAGE}:model-copy
 
 container-push-copy:
 	@echo "Pushing ${CONTAINER_IMAGE}:model-copy"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:model-copy
+	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:model-copy
+
+# Build container by downloading model inside it
+container-build-download:
+	@echo "Building container image that downloads model inside ${CONTAINER_IMAGE}:model-download"
+	@${RUNSUDO} docker build . -f build/containerfile_download -t ${CONTAINER_IMAGE}:model-download \
+		--build-arg YOUR_HOME="$$HOME" \
+		--build-arg MODEL_DIR="${MODEL_DIR}"
+
+# Run container with model
+container-run-download:
+	${RUNSUDO} docker run -it ${CONTAINER_IMAGE}:model-download
 
 container-push-download:
 	@echo "Pushing ${CONTAINER_IMAGE}:model-download"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:model-download
+	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:model-download
 
 # Test container builds -------------------------------------------------
 
 # Test container build
-test-container: test-dummy-sudo test-container-build-no-model test-container-build-copy-home test-container-build-copy-local test-container-build-download test-container-build-download-py
+test-container: test-dummy-sudo test-container-build-no-model test-container-build-copy test-container-build-download
 test-dummy-sudo:
 	@${RUNSUDO} ls
 test-container-build-copy: download container-build-copy container-run-copy
 test-container-build-download: container-build-download container-run-download
 test-container-build-no-model: download container-build-no-model container-run-no-model
 test-container-build-no-model-bin: download container-build-no-model-bin container-run-no-model-bin
+
+container-push: container-push-no-model container-push-no-model-bin container-push-copy container-push-download
