@@ -6,3 +6,4 @@ devpi/secret/secretfile
 llm/_security/simple_garak/runs/**
 **/.cache
 .vscode/
+llm/_security/terrapin/terrapin
