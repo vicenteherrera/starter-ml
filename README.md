@@ -23,7 +23,9 @@ Each example has a `README.md` file explaining it. Continue reading down this pa
     * [pickle](llm/_security/pickle): Shows how pickle binary data format can be insecure.
     * [simple_garak](llm/_security/simple_garak): Scan OpenAI and local models with Garak vuln analysis.
     * [llm_guard_openai](llm/_security/llm_guard_openai): Test LLM Guard mitigation with OpenAI endpoint.
+    * [promptfoo](llm/_security/promptfoo): Security evaluation of LLM models.
     * [terrapin](llm/_security/terrapin): Model attestation using Terrapin.
+
 
 ## Prerequisites
 
