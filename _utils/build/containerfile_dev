@@ -3,7 +3,7 @@
 FROM python@sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd72147d8 as builder
 
 ARG USER_ID
-RUN if test ${USER_ID:-10000} -lt 1000 ; then echo "Error: USER_ID argument must be greater than 1000" && exit 1 ; fi
+RUN if test ${USER_ID:-10000} -lt 1000 ; then echo "Error: USER_ID argument must be equal or greater than 1000" && exit 1 ; fi
 # We accept an input userid to make it easier to run mounting local files from a developers computer
 
 ARG YOUR_ENV
@@ -29,10 +29,11 @@ RUN pip install --require-hashes -r ./base_requirements/poetry.out && \
 # #     git
 
 ARG USER_ID
+RUN chown -R ${USER_ID:-10000} /usr/local
 USER ${USER_ID:-10000}
-
 ENV HOME="/home/user"
 WORKDIR ${HOME}
+
 RUN echo 'export PS1="\w $ "' > ${HOME}/.bashrc
 
 # PyEnv
