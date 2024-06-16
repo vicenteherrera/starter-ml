@@ -38,6 +38,7 @@ pipeline = transformers.pipeline(
   torch_dtype=dtype,
   device_map="auto",
   token=config["HUGGINGFACE_TOKEN"],
+  truncation=True
 )
 print('Model loaded in:', (time.time() - loading_time), 'seconds')
 
