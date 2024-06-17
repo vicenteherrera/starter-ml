@@ -37,5 +37,4 @@ COPY ./src /app/src
 ENV HF_HUB_OFFLINE=1 
 ENV HF_HUB_DISABLE_TELEMETRY=1
 
-# CMD ["poetry",  "--quiet", "run", "python", "./src/app.py"]
-CMD sh
+CMD ["poetry",  "--quiet", "run", "python", "./src/app.py"]

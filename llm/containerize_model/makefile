@@ -12,7 +12,7 @@ MODEL=TinyLlama/TinyLlama-1.1B-Chat-v1.0
 COMMIT=ce0c99637bf2aba3265ec4675b50eadb26ac5a21
 MODEL_DIR=./.cache/huggingface/hub/${MODEL}
 
-CONTAINER_IMAGE=quay.io/vicenteherrera/llm-test
+CONTAINER_IMAGE=quay.io/vicenteherrera/test-llm
 
 CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "")
 
@@ -58,8 +58,8 @@ run-offline-local-bin:
 
 download: download-local-git-https
 
-download-local-git-ssh: config_exists
-	@make -s git-prepare
+download-local-git-ssh: 
+	@make -s config_exists git-prepare
 	git clone --depth 1 git@hf.co:${MODEL} "${MODEL_DIR}"
 	@make -s git-finish
 
@@ -193,6 +193,17 @@ container-validate-base:
 		--certificate-oidc-issuer https://accounts.google.com \
 		--certificate-identity keyless@distroless.iam.gserviceaccount.com
 
+container-setup-buildx:
+	@echo "Setting up builx with driver docker-container for attestation"
+	if [ -z "$$(docker ps --filter "name=mybuilder" --format '{{.Names}}')" ]; then \
+		docker buildx install && \
+		docker buildx create --use --name mybuilder --driver docker-container && \
+		docker buildx inspect mybuilder --bootstrap ; \
+	fi
+
+container-deactivate-buildx:
+	docker buildx rm mybuilder
+
 # TODO: Validate each base container image
 
 # Not puting the model in the container ---------------------
@@ -202,8 +213,17 @@ container-validate-base:
 # Build container without model
 container-build-no-model:
 	@echo "Building container image without model ${CONTAINER_IMAGE}:no-model"
+	${RUNSUDO} docker build . -f build/containerfile_no_model \
+		-t ${CONTAINER_IMAGE}:no-model \
+		--build-arg USER_ID="$$(id -u)" \
+		--build-arg YOUR_ENV="production"
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model
+
+container-build-attest-push-no-model: container-setup-buildx
+	@echo "Building, attest and pushing container image without model ${CONTAINER_IMAGE}:no-model"
 	${RUNSUDO} docker buildx build . -f build/containerfile_no_model \
 	 	--sbom=true --provenance=true \
+		--platform linux/amd64 --push \
 		-t ${CONTAINER_IMAGE}:no-model \
 		--build-arg USER_ID="$$(id -u)" \
 		--build-arg YOUR_ENV="production"
@@ -213,26 +233,35 @@ container-push-no-model:
 	@echo "Pushing ${CONTAINER_IMAGE}:no-model"
 	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:no-model
 
-container-build-no-model-bin:
-	@echo "Building container image without model compiling binary ${CONTAINER_IMAGE}:no-model-bin"
-	${RUNSUDO} docker buildx build . -f build/containerfile_no_model_bin \
-		--sbom=true --provenance=true \
-		-t ${CONTAINER_IMAGE}:no-model-bin \
-		--build-arg USER_ID="$$(id -u)" \
-		--build-arg YOUR_ENV="production"
-	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model-bin
-
-container-push-no-model-bin:
-	@echo "Pushing ${CONTAINER_IMAGE}:no-model-bin"
-	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:no-model-bin
-
-container-run-no-model:
+container-run-no-model: download
 	@PROJ_HOME=$$PWD  && \
 	${RUNSUDO} docker run -it \
 		-v "$$PROJ_HOME/.cache":/app/.cache:ro \
 		-e MODEL_DIR="${MODEL_DIR}" \
 		-u $$(id -u):$$(id -g) \
 		${CONTAINER_IMAGE}:no-model
+
+# We need to change the container user to have access to the mounted files
+# If using an independent volume, this shouldn't be a problem	
+# https://forums.docker.com/t/we-cant-push-a-docker-volume-so-now-what/56160/2
+
+container-inspect-no-model:
+	docker buildx imagetools inspect ${CONTAINER_IMAGE}:no-model \
+    --format "{{ json .Provenance.SLSA }}"
+
+# https://docs.docker.com/build/attestations/slsa-provenance/
+
+container-build-no-model-bin:
+	@echo "Building container image without model compiling binary ${CONTAINER_IMAGE}:no-model-bin"
+	${RUNSUDO} docker build . -f build/containerfile_no_model_bin \
+		-t ${CONTAINER_IMAGE}:no-model-bin \
+		--build-arg USER_ID="$$(id -u)" \
+		--build-arg YOUR_ENV="production" 
+	@${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:no-model-bin
+
+container-push-no-model-bin:
+	@echo "Pushing ${CONTAINER_IMAGE}:no-model-bin"
+	@${RUNSUDO} docker push ${CONTAINER_IMAGE}:no-model-bin
 
 container-run-no-model-bin:
 	@PROJ_HOME=$$PWD  && \
@@ -242,14 +271,14 @@ container-run-no-model-bin:
 		-u $$(id -u):$$(id -g) \
 		${CONTAINER_IMAGE}:no-model-bin
 
-# We need to change the container user to have access to the mounted files
-# If using an independent volume, this shouldn't be a problem	
-# https://forums.docker.com/t/we-cant-push-a-docker-volume-so-now-what/56160/2
+container-inspect-no-model-bin:
+	docker buildx imagetools inspect ${CONTAINER_IMAGE}:no-model-bin \
+    --format "{{ json .Provenance.SLSA }}"
 
 # Copy or download the model inside the container ------------------------------------
 
 # Build container by copying model from local folder
-container-build-copy:
+container-build-copy: download
 	@echo "Building container image copying model ${CONTAINER_IMAGE}:model-copy"
 	@${RUNSUDO} docker build . -f build/containerfile_copy -t ${CONTAINER_IMAGE}:model-copy \
 		--build-arg HF_HOME_LOCAL='./.cache/huggingface/' \
@@ -282,12 +311,12 @@ container-push-download:
 # Test container builds -------------------------------------------------
 
 # Test container build
-test-container: test-dummy-sudo test-container-build-no-model test-container-build-copy test-container-build-download
+test-container: test-dummy-sudo test-container-no-model test-container-no-model-bin test-container-copy test-container-download
 test-dummy-sudo:
 	@${RUNSUDO} ls
-test-container-build-copy: download container-build-copy container-run-copy
-test-container-build-download: container-build-download container-run-download
-test-container-build-no-model: download container-build-no-model container-run-no-model
-test-container-build-no-model-bin: download container-build-no-model-bin container-run-no-model-bin
+test-container-no-model: container-build-no-model container-run-no-model
+test-container-no-model-bin: container-build-no-model-bin container-run-no-model-bin
+test-container-copy: container-build-copy container-run-copy
+test-container-download: container-build-download container-run-download
 
 container-push: container-push-no-model container-push-no-model-bin container-push-copy container-push-download
