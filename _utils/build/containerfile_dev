@@ -5,6 +5,7 @@ FROM python@sha256:1620f0640a0e4a791022396a06173be18a9476d4d705e9962240bfcdd7214
 ARG USER_ID
 RUN if test ${USER_ID:-10000} -lt 1000 ; then echo "Error: USER_ID argument must be equal or greater than 1000" && exit 1 ; fi
 # We accept an input userid to make it easier to run mounting local files from a developers computer
+# But we check it's high enough
 
 ARG YOUR_ENV
 ENV YOUR_ENV=${YOUR_ENV} \
@@ -15,12 +16,42 @@ ENV YOUR_ENV=${YOUR_ENV} \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100
 
+# Poetry, Pyinstaller and Nuitka from hashed requirement files
 COPY ./build/base_requirements/ ./base_requirements/
 RUN pip install --require-hashes -r ./base_requirements/poetry.out && \
     pip install --require-hashes -r ./base_requirements/pyinstaller.out && \
     pip install --require-hashes -r ./base_requirements/nuitka.out && \
     rm -r ./base_requirements && \
     apt-get install libffi-dev libsqlite3-dev
+
+# Cosign
+RUN curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64" && \
+    mv cosign-linux-amd64 /usr/local/bin/cosign && \
+    chmod a+rx /usr/local/bin/cosign
+
+# Go
+RUN wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz && \
+  rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.4.linux-amd64.tar.gz && \
+  rm go1.22.4.linux-amd64.tar.gz && \
+  echo 'export PATH=$PATH:/usr/local/go/bin' >>.bashrc
+
+# Terrapin
+RUN export PATH=$PATH:/usr/local/go/bin && \
+  git clone --depth 1 https://github.com/fkautz/terrapin-go.git && \
+  cd terrapin-go && \
+  git fetch --depth 1 origin d97e69f43a2170e42cb7b79671111d65bc53bf13 && \
+  git -c advice.detachedHead=false checkout d97e69f43a2170e42cb7b79671111d65bc53bf13 && \
+  go build -o ./terrapin ./cmd/terrapin && \
+  mv terrapin /usr/local/bin/terrapin && \
+  chmod a+rx /usr/local/bin/terrapin  && \
+  cd .. && rm -rf ./terrapin-go
+
+# Node 22
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash
+
+# GitLFS
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+  apt-get install git-lfs
 
 # RUN apt-get update && apt-get install -y \
 # #     build-essential \
@@ -34,12 +65,13 @@ USER ${USER_ID:-10000}
 ENV HOME="/home/user"
 WORKDIR ${HOME}
 
-RUN echo 'export PS1="\w $ "' > ${HOME}/.bashrc
+RUN echo 'export PS1="\w $ "' >> ${HOME}/.bashrc
 
 # PyEnv
 RUN git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
 ENV PYENV_ROOT="${HOME}/.pyenv"
 ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
+
 
 # Speed up examples by having common Python version preinstalled with pyenv
 RUN pyenv install 3.11.7

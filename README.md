@@ -7,7 +7,7 @@ Introductory examples for using Machine Learning, Large Language Modles (LLM) an
 
 Each example has a `README.md` file explaining it. Continue reading down this page first for general instructions.
 
-* [_utils](_utils): General utilities, like a container with PyEnv and Poetry to use as an instant development shell.
+* [_utils](_utils): General utilities, like a container with PyEnv, Poetry and other binaries to use as an instant development shell.
 * [devpi](llm/devpi): Use `devpi` to cache and serve PiPY packages locally.
 * [jupyter_ml](llm/jupyter_ml): Lightweight way to use Jupyter Notebooks locally.
 * **llm (Large Language Models)**
@@ -30,21 +30,41 @@ Each example has a `README.md` file explaining it. Continue reading down this pa
 
 ## Prerequisites
 
-You have the alternative to use a container image to navigate and test the examples with all pre-requisites met. To do so, use `cd _utils ; make`. 
+### Containerized
 
-Most examples rely on `pyenv` and `poetry` and a fixed `poetry.lock` file to provide perfectly repeatable environments. Check the [starter-python](https://github.com/vicenteherrera/starter-python) repository on how to install these requirements. Some examples includes a `make container-run` to run a docker container with all prerequisites included, check each example readme.
+You have the alternative to use a container image to navigate and test all the examples with all binary pre-requisites met. To do so, use:
+
+bash
+```bash
+cd _utils
+make container-run
+```
+
+Some examples have a container with their specific prerequisites installed, including in this case even local open source LLM (they are very big). Run them the same way:
+
+bash
+```bash
+cd llm/_security/llm_guard_openai
+make container-run
+```
+
+These containers are not built to be small or very safe, but to be very convenient to run the examples. To check an example containerization with minimal safe containers, check the examples [client_server_openai](llm/client_server_openai) and [containerize_model](llm/containerize_model).
+
+### Install requirements
+
+Most examples rely on `pyenv` and `poetry` and a fixed `poetry.lock` file to provide perfectly repeatable environments. Check the [starter-python](https://github.com/vicenteherrera/starter-python) repository on how to install these requirements.
 
 On Linux for some local models, before you install a specific Python version, you need to install the `libffi` package with: `sudo apt-get install libffi-dev`.
 
-To run Jupyter you have to install `libsqlite3-dev`. Check the troubleshooting section about that.
+To run Jupyter server you have to install the `libsqlite3-dev` package. Check the troubleshooting section about that.
 
-Some specific examples may require tools like `cosign`, or Docker buildx.
+Some specific examples may require tools like `cosign`, Git LFS, Docker buildx, or npm. Check each individual example readme file.
 
 ## Using Visual Studio Code
 
 When you open a terminal within _Visual Studio Code_, it tries to activate the virtual environment specified by Poetry at that directory. As this repo contains many Poetry definitions it may confuse VSCode. So if you plan to run commands through the Visual Studio Code terminal, it's best to open just the example directory with Code to do so. You can also try to `deactivate` an automatically loaded virtual environment in VSCode terminal.
 
-## API Keys:
+## API Keys
 
 Some examples download models from Huggingface, if you create a free account and [set up an API key token](https://huggingface.co/docs/hub/en/security-tokens), you will ensure you are not throttled when doing so.
 
@@ -54,8 +74,7 @@ Copy `sample-env.txt` to `env.txt` and put your API keys there. You could do tha
 
 ## Running examples
 
-All examples have a `makefile` with several targets, most of the time just executing `make` will setup and install everything, as well as execute the main example in the directory.
-
+All examples have a `makefile` with several targets, most of the time just executing `make` will setup and install everything, as well as execute the main example in the directory, or print help on further commands.
 
 ## Troubleshooting
 
@@ -94,7 +113,6 @@ If you already had Python installed, you can reinstall it after you update this 
 ```bash
 make refresh
 ```
-
 
 ### Errors while installing a specific Python version with PyEnv
 

@@ -13,6 +13,7 @@ COMMIT=ce0c99637bf2aba3265ec4675b50eadb26ac5a21
 MODEL_DIR=./.cache/huggingface/hub/${MODEL}
 
 DIGEST_DIR=$(shell pwd)/digest
+GPG_DIR=$(shell pwd)/gpg
 
 CONTAINER_IMAGE=quay.io/vicenteherrera/test-llm
 CONTAINER_TAG=no-model
@@ -41,8 +42,12 @@ help:
 	@echo "# Validate model files with stored digest"
 	@echo "make run-validate-digest"
 	@echo ""
+	@echo "# Validate model files with gpg detached signatures"
+	@echo "make run-validate-gpg"
+	@echo ""
 	@echo "# Verify signed container with public key using cosign against online rekor"
 	@echo "make container-pull run-container-verify-key"
+
 # run ----------------------------------------------------------------
 
 run-container-sign-keyless: container-pull
@@ -90,7 +95,19 @@ run-validate-digest:
 	@echo "Calculating hash of global directory for ${MODEL}"
 	@cd "./.cache/huggingface/hub/" && \
 	[ "$$(find ${MODEL} -type f \( -exec sha1sum {} \; \) | awk '{print $1}' | sort | sha1sum)" = "$$(cat ${DIGEST_DIR}.digest)" ] && echo "[ Valid ] ${DIGEST_DIR}.digest" || echo "[*ERROR*] ${DIGEST_DIR}.digest"
-	
+
+run-gpg-sign:
+	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
+	mkdir -p ${GPG_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --output ${GPG_DIR}/{}.sig --yes --detach-sign {}' +
+
+run-gpg-verify:
+	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
+	mkdir -p ${GPG_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --verify ${GPG_DIR}/{}.sig {}' +
+
 
 run-model-sign:
 	for FILE in ".cache/huggingface/hub/${MODEL}"/*; do \
