@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Vicente Herrera <vicenteherrera@vicenteherrera.com>"]
 readme = "README.md"
+package-mode = false
 
 [[tool.poetry.source]]
 name = "PyPI"
