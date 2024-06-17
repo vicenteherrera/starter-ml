@@ -8,3 +8,4 @@ llm/_security/simple_garak/runs/**
 .vscode/
 llm/_security/terrapin/terrapin
 **/cosign.key
+**/dist
