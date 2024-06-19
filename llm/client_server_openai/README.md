@@ -4,7 +4,7 @@ Create a server LLM endpoint for OpenAI, and a client to connect to it using Str
 
 ## Architecture
 
-[ backend ] :3000 <-- [ frontend ] :8501 <-- [ browser ]
+[OpenAI endpoint] <-- [ backend ] :3000 <-- [ frontend ] :8501 <-- [ browser ]
 
 * Backend:
   * Connects to OpenAI endpoint
@@ -35,6 +35,12 @@ cd frontend && make container-build container-run
 cd backend && make run
 cd frontend && make run
 ```
+
+## Alternative backend using RAG
+
+There is a `backend_v2` alternative that implements RAG with a local vector database in the same backend container. To use it with docker-compose or Kubernetes, change the backend image to use `quay.io/vicenteherrera/test-llm-backend:openai-rag-0.0.1`.
+
+Check also the [rag_langnchain_openai](../rag_langnchain_openai) example.
 
 ## More information
 
