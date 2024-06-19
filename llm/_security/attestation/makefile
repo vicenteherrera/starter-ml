@@ -219,9 +219,10 @@ git-finish:
 
 container-run:
 	${RUNSUDO} docker run -it \
-		-v "$$(pwd)/../":/home/user/starter-ml \
+		-v "$$(pwd)/../attestation":/home/user/attestation \
 		-u $$(id -u):$$(id -g) \
-		quay.io/vicenteherrera/python-dev-shell:3.11.7
+		quay.io/vicenteherrera/python-dev-shell:3.11.7 \
+		sh -c "cd attestation && make help && /bin/bash"
 
 size:
 	@echo "Size of models in ./.cache/huggingface/"
