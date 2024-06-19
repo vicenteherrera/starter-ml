@@ -24,7 +24,7 @@ Each example has a `README.md` file explaining it. Continue reading down this pa
     * [simple_garak](llm/_security/simple_garak): Scan OpenAI and local models with Garak vuln analysis.
     * [llm_guard_openai](llm/_security/llm_guard_openai): Test LLM Guard mitigation with OpenAI endpoint.
     * [promptfoo](llm/_security/promptfoo): Security evaluation of LLM models.
-    * [attestation](llm/_security/attestation): Simple attestation examples using SHA256 digest for model files, and cosign for container image.
+    * [attestation](llm/_security/attestation): Simple attestation examples using sha1sum digest, gpg, cosign and CycloneDX.
     * [terrapin](llm/_security/terrapin): Model attestation using Terrapin.
 
 
@@ -53,6 +53,8 @@ These containers are not built to be small or very safe, but to be very convenie
 ### Install requirements
 
 Most examples rely on `pyenv` and `poetry` and a fixed `poetry.lock` file to provide perfectly repeatable environments. Check the [starter-python](https://github.com/vicenteherrera/starter-python) repository on how to install these requirements.
+
+Examples that download open source models from Huggingface [require git LFS to be installed](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage). By default they employ HTTPS, if you switch them to use SSH (more secure), you have to setup your public key in your Huggingface profile.
 
 On Linux for some local models, before you install a specific Python version, you need to install the `libffi` package with: `sudo apt-get install libffi-dev`.
 

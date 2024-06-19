@@ -36,7 +36,7 @@ help:
 	@echo "# Generate model digest SHA256"
 	@echo "make run-generate-digest"
 	@echo ""
-	@echo "# Tamper with the model"
+	@echo "# Tamper with the model, so you see an error on validation"
 	@echo "make run-tamper-model"
 	@echo ""
 	@echo "# Validate model files with stored digest"
@@ -45,10 +45,110 @@ help:
 	@echo "# Validate model files with gpg detached signatures"
 	@echo "make run-validate-gpg"
 	@echo ""
-	@echo "# Verify signed container with public key using cosign against online rekor"
+	@echo "# Validate model files with cosign detached signatures"
+	@echo "make run-cosign-verify"
+	@echo ""
+	@echo "# Generate an CycloneDX BOM file from model"
+	@echo "make run-mlbom-generate"
+	@echo ""
+	@echo "# Verify the signature of the reference CycloneDX BOM file provided"
+	@echo "make run-mlbom-verify-sign"
+	@echo ""
+	@echo "# Conventional diff the generated and reference CycloneDX BOM files"
+	@echo "make run-mlbom-diff-with-reference"
+	@echo ""
+	@echo "# Verify signed container with inference code using public key and cosign against online rekor"
 	@echo "make container-pull run-container-verify-key"
 
 # run ----------------------------------------------------------------
+
+run-tamper-model:
+	echo -n '   ' >> ${MODEL_DIR}/config.json
+
+# sha1sum digest
+
+run-generate-digest:
+	@echo "Calculating hash of individual files for ${MODEL} into ${DIGEST_DIR}" && \
+	mkdir -p ${DIGEST_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'sha1sum {} | tee ${DIGEST_DIR}/{}.digest'
+
+	@echo ""
+	@echo "Calculating hash of global directory for ${MODEL}"
+	@cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f \( -exec sha1sum {} \; \) | awk '{print $1}' | sort | sha1sum | tee ${DIGEST_DIR}.digest
+
+run-validate-digest:
+	@echo "Validating hash of individual files for ${MODEL} into ${DIGEST_DIR}" && \
+	mkdir -p ${DIGEST_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c '[ "$$(sha1sum {})" = "$$(cat ${DIGEST_DIR}/{}.digest)" ] && echo "[ Valid ] {}" || echo "[*ERROR*] {}"'
+	@echo ""
+	@echo "Calculating hash of global directory for ${MODEL}"
+	@cd "./.cache/huggingface/hub/" && \
+	[ "$$(find ${MODEL} -type f \( -exec sha1sum {} \; \) | awk '{print $1}' | sort | sha1sum)" = "$$(cat ${DIGEST_DIR}.digest)" ] && echo "[ Valid ] ${DIGEST_DIR}.digest" || echo "[*ERROR*] ${DIGEST_DIR}.digest"
+
+# gpg
+
+run-gpg-sign:
+	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
+	mkdir -p ${GPG_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --output ${GPG_DIR}/{}.sig --yes --detach-sign {}' +
+
+run-gpg-verify:
+	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
+	mkdir -p ${GPG_DIR}/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --verify ${GPG_DIR}/{}.sig {}' +
+
+# cyclonedx
+
+run-mlbom-generate:
+	mkdir -p mlbom/${MODEL}
+	cyclonedx add files --no-input \
+		--output-format xml \
+		--exclude /.git/** \
+		--base-path .cache/huggingface/hub/ \
+		--output-file mlbom/${MODEL}/mlbom.xml
+
+run-mlbom-analyze:
+	cyclonedx analyze --input-format xml \
+		--input-file mlbom/${MODEL}/mlbom.xml \
+		--multiple-component-versions
+
+run-mlbom-validate:
+	cyclonedx validate --input-format xml \
+		--input-file mlbom/${MODEL}/mlbom.xml \
+		--fail-on-errors
+
+run-mlbom-reference-sign:
+	cp mlbom/${MODEL}/mlbom.xml mlbom/${MODEL}/mlbom-reference.xml
+	cyclonedx sign bom mlbom/${MODEL}/mlbom.xml \
+		--key-file $$HOME/.ssh/mlbom.key
+
+run-mlbom-reference-verify-sign:
+	cyclonedx verify all mlbom/${MODEL}/mlbom-reference.xml \
+		--key-file ./pubkeys/mlbom.pub
+
+run-mlbom-diff:
+	diff mlbom/${MODEL}/mlbom-reference.xml mlbom/${MODEL}/mlbom.xml
+
+# Cosign model
+
+run-cosign-sign:
+	export OUTPUT_DIR="$(shell pwd)/cosign" && \
+	mkdir -p $$OUTPUT_DIR/${MODEL} && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && COSIGN_PASSWORD="changeme" cosign sign-blob --key $$HOME/.ssh/cosign.key --output-signature $$OUTPUT_DIR/{}.sig {} --yes' +
+
+run-cosign-verify:
+	export OUTPUT_DIR="$(shell pwd)/cosign" && \
+	export PUBKEY="$(shell pwd)/pubkeys/cosign.pub" && \
+	cd "./.cache/huggingface/hub/" && \
+	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && cosign verify-blob --key $$PUBKEY --signature $$OUTPUT_DIR/{}.sig {}' +
+
+# Cosign container
 
 run-container-sign-keyless: container-pull
 	@echo "Siging keyless container image ${CONTAINER_IMAGE}@${CONTAINER_SHA}"
@@ -72,62 +172,17 @@ run-container-verify-key: container-pull
 		--key cosign.pub \
 		${CONTAINER_IMAGE}@${CONTAINER_SHA}
 
-run-tamper-model:
-	echo -n '   ' >> ${MODEL_DIR}/config.json
+# Utilities
 
-run-generate-digest:
-	@echo "Calculating hash of individual files for ${MODEL} into ${DIGEST_DIR}" && \
-	mkdir -p ${DIGEST_DIR}/${MODEL} && \
-	cd "./.cache/huggingface/hub/" && \
-	find ${MODEL} -type f | xargs -I {} sh -c 'sha1sum {} | tee ${DIGEST_DIR}/{}.digest'
-
-	@echo ""
-	@echo "Calculating hash of global directory for ${MODEL}"
-	@cd "./.cache/huggingface/hub/" && \
-	find ${MODEL} -type f \( -exec sha1sum {} \; \) | awk '{print $1}' | sort | sha1sum | tee ${DIGEST_DIR}.digest
-
-run-validate-digest:
-	@echo "Validating hash of individual files for ${MODEL} into ${DIGEST_DIR}" && \
-	mkdir -p ${DIGEST_DIR}/${MODEL} && \
-	cd "./.cache/huggingface/hub/" && \
-	find ${MODEL} -type f | xargs -I {} sh -c '[ "$$(sha1sum {})" = "$$(cat ${DIGEST_DIR}/{}.digest)" ] && echo "[ Valid ] {}" || echo "[*ERROR*] {}"'
-	@echo ""
-	@echo "Calculating hash of global directory for ${MODEL}"
-	@cd "./.cache/huggingface/hub/" && \
-	[ "$$(find ${MODEL} -type f \( -exec sha1sum {} \; \) | awk '{print $1}' | sort | sha1sum)" = "$$(cat ${DIGEST_DIR}.digest)" ] && echo "[ Valid ] ${DIGEST_DIR}.digest" || echo "[*ERROR*] ${DIGEST_DIR}.digest"
-
-run-gpg-sign:
-	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
-	mkdir -p ${GPG_DIR}/${MODEL} && \
-	cd "./.cache/huggingface/hub/" && \
-	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --output ${GPG_DIR}/{}.sig --yes --detach-sign {}' +
-
-run-gpg-verify:
-	@echo "Gpg sign individual files for ${MODEL} into ${GPG_DIR}" && \
-	mkdir -p ${GPG_DIR}/${MODEL} && \
-	cd "./.cache/huggingface/hub/" && \
-	find ${MODEL} -type f | xargs -I {} sh -c 'echo "{}" && gpg --verify ${GPG_DIR}/{}.sig {}' +
-
-
-run-model-sign:
-	for FILE in ".cache/huggingface/hub/${MODEL}"/*; do \
-  	cosign sign-blob --key $$HOME/.ssh/cosign.key "$$FILE" \
-			--output-signature "signatures/$$FILENAME.sig" \
-		; \
-	done
-
-run-model-verify:
-	for FILE in ".cache/huggingface/hub/${MODEL}"/*; do \
-  	cosign verify-blob --key cosign.pub --signature "signatures/$$FILE.sig" "$$FILE" ; \
-	done
-
-
-
+mlbom-keygen:
+	cyclonedx keygen \
+		--private-key-file $$HOME/.ssh/mlbom.key \
+		--public-key-file pubkeys/mlbom.pub
 
 cosign-generate-key-pair:
 	cosign generate-key-pair
-	cp cosign.* $$HOME/.ssh
-	rm cosign.key
+	mv cosign.key $$HOME/.ssh
+	mv cosign.pub ./pubkeys
 
 container-pull:
 	docker pull ${CONTAINER_IMAGE}:${CONTAINER_TAG}
@@ -160,21 +215,13 @@ git-finish:
 	git -c advice.detachedHead=false checkout "${COMMIT}"
 	rm -rf "${MODEL_DIR}"/.git
 
-# Requirements ----------------------------------------------------------------
+#  ----------------------------------------------------------------
 
-config_exists:
-	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
-	@echo "Config file found at ${CONFIG_FILE}"
-
-# Libraries utilities ----------------------------------------
-
-delete: delete_local_huggingface
-
-delete_venv:
-	poetry env remove --all ||:
-
-delete_local_huggingface:
-	rm -r ./.cache/huggingface/hub ||:
+container-run:
+	${RUNSUDO} docker run -it \
+		-v "$$(pwd)/../":/home/user/starter-ml \
+		-u $$(id -u):$$(id -g) \
+		quay.io/vicenteherrera/python-dev-shell:3.11.7
 
 size:
 	@echo "Size of models in ./.cache/huggingface/"
