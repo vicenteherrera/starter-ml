@@ -25,9 +25,14 @@ RUN pip install --require-hashes -r ./base_requirements/poetry.out && \
     apt-get install libffi-dev libsqlite3-dev
 
 # Cosign
-RUN curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64" && \
+RUN curl -O -L "https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-linux-amd64" && \
     mv cosign-linux-amd64 /usr/local/bin/cosign && \
     chmod a+rx /usr/local/bin/cosign
+
+# CycloneDX CLI
+RUN curl -O -L "https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.25.1/cyclonedx-linux-x64" && \
+    mv cyclonedx-linux-x64 /usr/local/bin/cyclonedx && \
+    chmod a+rx /usr/local/bin/cyclonedx
 
 # Go
 RUN wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz && \
