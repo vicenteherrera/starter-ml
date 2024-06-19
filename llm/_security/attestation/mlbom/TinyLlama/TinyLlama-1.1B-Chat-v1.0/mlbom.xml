@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" serialNumber="urn:uuid:eaf3bc2d-3a7b-4713-87f6-dffc4e1243da" xmlns="http://cyclonedx.org/schema/bom/1.5">
+  <metadata>
+    <timestamp>2024-06-19T22:18:12.7298697Z</timestamp>
+    <tools>
+      <components>
+        <component type="application">
+          <name>CycloneDX CLI</name>
+          <version>0.25.1.0</version>
+        </component>
+      </components>
+    </tools>
+  </metadata>
+  <components>
+    <component type="file">
+      <name>special_tokens_map.json</name>
+      <version>0.0.0-75fb4a9cab3a</version>
+      <hashes>
+        <hash alg="SHA-1">75fb4a9cab3ae654949b567abc0b4e2db28e46e6</hash>
+        <hash alg="SHA-256">82d96d7a9e6ced037f12394b7ea6a5b02e6ca87e0d11edaa8d60d9be857ce7db</hash>
+        <hash alg="SHA-384">7d4b419e4fe1d9544775c2ecf7747ad89299f85ba07381c0c6c078ba52689425f49623a75402818733d9e48a9f19459a</hash>
+        <hash alg="SHA-512">32676395b5523df1373efcafb082e2a0554e5df8caba130213619e67c734aafd3a53cc70c10387df9b1f40d679fd6d196072fa69a7dd8855ec77a62a1c366526</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>README.md</name>
+      <version>0.0.0-97e3cd203fde</version>
+      <hashes>
+        <hash alg="SHA-1">97e3cd203fde0682e33d64a80ba5d002ce1d42eb</hash>
+        <hash alg="SHA-256">6f620f661ce3f8425b49301b64a642aa7451ce9fbd3b8115e899de59147121c8</hash>
+        <hash alg="SHA-384">00105100b212a3e5d4f6115019e08d8c824291caf66e239b5f18ddbfec69287d7d46b54571b21f1a45042c56c2c022ba</hash>
+        <hash alg="SHA-512">f7dc151317d6f6686f222308137f526f08ba91ada9ee94bdaeedca82c8ff1ccb3fbba63ffb6e0c18dae04665ebd65be3f8eba5d1fc4f6c75c50b00abaa599b1b</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>config.json</name>
+      <version>0.0.0-531311a10fbd</version>
+      <hashes>
+        <hash alg="SHA-1">531311a10fbdcbadd17a3a4bb87f317552756fe9</hash>
+        <hash alg="SHA-256">2facf1eeaf9d44e11be596df01b1395a7f4ff4e9f0d7d5d6a9549bf18d3332c9</hash>
+        <hash alg="SHA-384">e970450dceca3990b04a29672407dd28127979d22d615ca5768ccba11734880f3e7f86bee17256ff3c01b60822eb6114</hash>
+        <hash alg="SHA-512">ce7422c07e61c6c79afdb2d3838aa24513a34eb179679d8895037d48145c69a546d230f54ee3f19ad8a5214d60799bee2498c0ed6a42a32ba291a1b7bfebc67d</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>tokenizer_config.json</name>
+      <version>0.0.0-c36b11899997</version>
+      <hashes>
+        <hash alg="SHA-1">c36b11899997ca4af1d27d6a4fc07645df662935</hash>
+        <hash alg="SHA-256">7b41ba7d0eb91e77914ca3dafde559ea3e19878769b7e68409e89bed5222e77a</hash>
+        <hash alg="SHA-384">fbbf4faa6e42e03da754beb956ec5235fee0126132014e3ddac7396a15c07482f94775e9302d7d5908e80f33d49ccfa1</hash>
+        <hash alg="SHA-512">6a739e55d39394d21cd925be886a38438c30b8d29fb5864419f18c6c00f22998225eb573e19c2b1fdd1fa3887f379c25e27a4f9084c10a0fa90844f491e9f573</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>tokenizer.json</name>
+      <version>0.0.0-58a9aabceba5</version>
+      <hashes>
+        <hash alg="SHA-1">58a9aabceba5d9501472af05eb8246e9e7e98fd6</hash>
+        <hash alg="SHA-256">bcd04f0eadf90287bd26e1a183ac487d8a141b09b06aecb7725bbdd343640f2e</hash>
+        <hash alg="SHA-384">634ace9c44c36b515ea25e60839a832daf03f85a25ae84e47060086d4f1f7b27d6511b9803c768620c43e7106a753d2e</hash>
+        <hash alg="SHA-512">85395b16026d74e2a2efba702539bac94c8d131ab44da973171418dacc58605338f939f83d293d9855d30b870d23d0c513c3716789af957cb61f2517e3008b13</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>eval_results.json</name>
+      <version>0.0.0-9d9828d255f3</version>
+      <hashes>
+        <hash alg="SHA-1">9d9828d255f3f3d6c8a40739db8481ea3ceb050e</hash>
+        <hash alg="SHA-256">637daaebe7aa8af0e678f9e79ec33fa29f8635090d45ec813f0e7474320d7351</hash>
+        <hash alg="SHA-384">ac1e6ca98dd9cfcc4779bdd5c8ce466e0517d20e545810f940b5b6ed14f64846cf5fa95ce50a57499caa0e9082fbe2b4</hash>
+        <hash alg="SHA-512">ee6d6acc2fcfa73b2b4658588dbed41de53ec1db14b6184ebe234b0dea04453d7d427e147e5a365df4cb16d5469a93e16218629c8dd5db1034b33e1eec42d676</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>.gitattributes</name>
+      <version>0.0.0-01519d1fc955</version>
+      <hashes>
+        <hash alg="SHA-1">01519d1fc9551a8db9141d62de4cc8b4db3bd1bc</hash>
+        <hash alg="SHA-256">11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361</hash>
+        <hash alg="SHA-384">28fbca293e71a86d841b7c66ca65480b9f61ed7f5ca50388804520a3d8bccab068c1cd7e1fee88fd5b2352c380bcb652</hash>
+        <hash alg="SHA-512">4058046f8faa1f6e22dcdd52337e959cc446ad02bde3f06ed5cc659975cc170f14ffd77d4500c872cabd1dd5f1643654b07325b62265ab47e18d78da21f5afe3</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>model.safetensors</name>
+      <version>0.0.0-428a63bbcb17</version>
+      <hashes>
+        <hash alg="SHA-1">428a63bbcb1755396906ff7ae51a05fea30f8d4e</hash>
+        <hash alg="SHA-256">6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933</hash>
+        <hash alg="SHA-384">003be8c87a069fce23cd04d6fd9c91b173294dcc81ee27002fac14ac2f41c53531f35175dd6bd9b1c9463b0e9734ef27</hash>
+        <hash alg="SHA-512">7da26d0f29b8bac6d4c59e6ca5816a4e87acd6cd169500fadc04668b22640ce1b04de600b15f74a0bb5a99f2da983e9bfbfdf94890f754456fd3a1b4e2ba7b01</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>generation_config.json</name>
+      <version>0.0.0-9bc194310827</version>
+      <hashes>
+        <hash alg="SHA-1">9bc194310827d9d6bcee94e180b9f85b6f11b238</hash>
+        <hash alg="SHA-256">18046d04f5bd8b4998095ecabdd17a1bf0053d9acdccead4a05be4a3575f3c5c</hash>
+        <hash alg="SHA-384">896d1530749229f123ca29841d10326b16d2ebb4de7a817020b2438920bc667486c0a526293ff6341fa19687f806e3db</hash>
+        <hash alg="SHA-512">1cb1b6f7e3e6b63f566f465c1bca25b8247e97e5b445b84f82e96c55ed918401837dc1e99df2faae592406892aa239c4e71685024d861ca796188999a5d0c8ed</hash>
+      </hashes>
+    </component>
+    <component type="file">
+      <name>tokenizer.model</name>
+      <version>0.0.0-7a4e789beca2</version>
+      <hashes>
+        <hash alg="SHA-1">7a4e789beca293352e60b6fad5eef1908070cee0</hash>
+        <hash alg="SHA-256">9e556afd44213b6bd1be2b850ebbbd98f5481437a8021afaf58ee7fb1818d347</hash>
+        <hash alg="SHA-384">743ae4ff119d34a39aa09ca9c1cd12fae8814783bb25e41febe99b646f02c6643c9e0ba64eaa0ad7777fb84fa303afe2</hash>
+        <hash alg="SHA-512">13c9ca779d3bdaba2f690287ba1f508d479a010c1f9122fd2bd523f310c16e2b877e93b42c18ab97b27f8fbfeb99e4f30fd999210e1b264d7d925530ff08255f</hash>
+      </hashes>
+    </component>
+  </components>
+</bom>
