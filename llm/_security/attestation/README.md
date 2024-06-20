@@ -82,7 +82,7 @@ Check [terrapin](../terrapin/README.md) example to learn about using that tool f
   * [MLBOM 101 (video)](https://drive.google.com/file/d/1mEWlTLq2tzsvNXlMe8xOub2CguqBsxXf/view)
   * [SPDX AI](https://spdx.dev/learn/areas-of-interest/ai/)
   * [CycloneDX cli](https://github.com/CycloneDX/cyclonedx-cli)
-  * [Artificial Intelligence Bill-of-Materials (AI BOMs): Ensuring AI Transparency and Traceability](https://becomingahacker.org/)artificial-intelligence-bill-of-materials-ai-boms-ensuring-ai-transparency-and-traceability-82322643bd2a)
+  * [Artificial Intelligence Bill-of-Materials (AI BOMs): Ensuring AI Transparency and Traceability](https://becomingahacker.org/artificial-intelligence-bill-of-materials-ai-boms-ensuring-ai-transparency-and-traceability-82322643bd2a)
   * [Manifest AIBOM (MLBOM) Wiki](https://github.com/manifest-cyber/aibom)
   * [Securing the LLM stack](https://blogs.cisco.com/learning/securing-the-llm-stack)
 
