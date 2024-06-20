@@ -4,7 +4,14 @@ This directory includes several examples related to attestation for machine lear
 
 ## Requirements
 
-For `cosign` examples, you need the [cosign binary installed](https://github.com/sigstore/cosign?tab=readme-ov-file#installation). For `CycloneDX` examples you need [it's cli installed](https://github.com/CycloneDX/cyclonedx-cli).
+You can run a container for a shell with all requirements installed with:
+```bash
+make run-container
+```
+
+It won't work to check signatures of a container unless you setup a docker-in-docker environment in the host.
+
+To run directly, for `cosign` examples, you need the [cosign binary installed](https://github.com/sigstore/cosign?tab=readme-ov-file#installation). For `CycloneDX` examples you need [it's cli installed](https://github.com/CycloneDX/cyclonedx-cli).
 
 ## Usage
 
