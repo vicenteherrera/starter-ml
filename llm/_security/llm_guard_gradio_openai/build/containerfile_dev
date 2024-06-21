@@ -1,0 +1,15 @@
+FROM quay.io/vicenteherrera/python-dev-shell:3.11.7
+
+ARG USER_ID
+USER ${USER_ID:-10000}
+ENV HOME="/home/user"
+WORKDIR ${HOME}
+
+ARG DIR
+COPY --chown=${USER_ID:-10000} . ./${DIR:-app}
+
+ENV HF_HOME='./.cache/huggingface/'
+EXPOSE 7860
+
+RUN cd ${DIR:-app} && make
+
