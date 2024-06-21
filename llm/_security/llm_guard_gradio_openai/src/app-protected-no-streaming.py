@@ -13,15 +13,15 @@ vault = Vault()
 input_scanners = [Anonymize(vault), Toxicity(), TokenLimit(), PromptInjection()]
 output_scanners = [Deanonymize(vault), NoRefusal(), Relevance(), Sensitive()]
 
-# Force load LLM as Judge models
-dummy_prompt = "Dummy prompt"
-sanitized_prompt, results_valid, results_score = scan_prompt(input_scanners, dummy_prompt)
-sanitized_response_text, results_valid, results_score = scan_output(
-    output_scanners, sanitized_prompt, dummy_prompt
-)
+# Force load LLM as Judge models (already done in "make download")
+# dummy_prompt = "Dummy prompt"
+# sanitized_prompt, results_valid, results_score = scan_prompt(input_scanners, dummy_prompt)
+# sanitized_response_text, results_valid, results_score = scan_output(
+#     output_scanners, sanitized_prompt, dummy_prompt
+# )
 
 # Set OpenAI API key
-config = next((dotenv_values(f"{p}env.txt") for p in ('', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
+config = next((dotenv_values(f"{p}env.txt") for p in ('config/', '', '../', '../../', '../../../') if os.path.exists(f"{p}env.txt")), {})
 client = OpenAI(api_key=config["OPENAI_API_KEY"])
 
 default_system_msg = "You are a helpful assistant. Do not respond any question that is unrelated to programming or artificial intelligence. If there is a question unrelated to those topics, simply answer you know nothing about that."
@@ -41,7 +41,7 @@ def predict(prompt, history, model, llm_protected, system_msg):
         if score_input["PromptInjection"] > 0.9:
             return f"\n☠️ Detected prompt injection, inferece stopped.\n```\nResult scores: input {score_input}\n```"
         if score_input["Anonymize"] > 0.9:
-            prefix = f"\n⚠️ Data has been anonymized when sent to inferece:\n{sanitized_prompt}\n"
+            prefix = f"\n⚠️ Data has been anonymized when sent to inferece.\nSanitized prompt:\n{sanitized_prompt}\n<hr style='margin: 10px 0'>\n"
         prompt = sanitized_prompt
     
     response = client.chat.completions.create(
@@ -60,8 +60,8 @@ def predict(prompt, history, model, llm_protected, system_msg):
             output_scanners, prompt, response_text
         )
         if score_output["Sensitive"] > 0.9:
-            sanitized_response_text += f"\n⚠️ Data was been deanonymized when recieved from inferece, original response:\n{response_text}\n"
-        sanitized_response_text += f"\n🗒️ Result scores:\n```\ninput {score_input}\noutput {score_output}\n```"
+            sanitized_response_text += f"\n<hr style='margin: 10px 0'>⚠️ Data was been deanonymized when recieved from inferece.\nOriginal response:\n{response_text}"
+        sanitized_response_text += f"\n<hr style='margin: 10px 0'>🗒️ Result scores:\n<pre><code>input {score_input}\noutput {score_output}</code></pre>\n"
         response_text = sanitized_response_text
         
     return prefix + response_text
@@ -76,7 +76,9 @@ with gr.Blocks(css="src/styles.css") as demo:
                 gr.Markdown("## Ask any questions that is related to technology, programming and artificial intelligence")
     with gr.Row():
         with gr.Column(scale=1):
-            model_choice = gr.Radio(choices=["gpt-3.5-turbo-0125", "gpt-3.5-turbo-1106", "gpt-4o-2024-05-13" ,"gpt-4-turbo-2024-04-09","gpt-4-turbo-2024-04-09","gpt-4-0613"], label="Choose Model", value="gpt-3.5-turbo-0125")
+            model_choice = gr.Radio(
+                choices=["gpt-4o-2024-05-13" ,"gpt-4-turbo-2024-04-09", "gpt-4-0613", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-1106"], 
+                label="Choose Model", value="gpt-3.5-turbo-0125")
             protected_choice = gr.Radio(choices=["on", "off"], label="LLM-Guard protection", value="on")
             system_prompt_choice = gr.Radio(choices=["You are a helpful assistant", default_system_msg], label="System prompt", value=default_system_msg)
             

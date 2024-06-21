@@ -1,16 +1,23 @@
 SHELL := /bin/bash
 
-CONFIG_FILE=$(shell for p in "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "") 
+DIR=$(shell basename $$(pwd))
+CONTAINER_IMAGE=quay.io/vicenteherrera/python-dev-shell
+CONTAINER_TAG=3.11.7-${DIR}
 
-all: requirements install_python install required_python size run
+CONFIG_FILE=$(shell for p in "config/env.txt" "env.txt" "../env.txt" "../../env.txt" "../../../env.txt"; do [[ -f "$$p" ]] && echo "$$p" && break; done || echo "") 
 
-run: run-protected
+all: requirements install_python install required_python download size help
 
-run-protected: config_exists
+help:
+	@echo ""
+	@echo "HELP"
+	@echo ""
+	@echo "# Run Gradio UI with LLM Guard example"
+	@echo "make run"
+	@echo ""
+
+run: config_exists
 	poetry run python ./src/app-protected-no-streaming.py
-
-run-unprotected: config_exists
-	poetry run python ./src/app-unprotected.py
 
 code:
 	poetry run code .
@@ -22,7 +29,8 @@ requirements:
 	which poetry
 
 config_exists:
-	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
+	@CHECK="${CONFIG_FILE}" && \
+	[ -z "$${CHECK// /}" ] && echo "Error: Config file env.txt not found" && exit 1 ||:
 	@echo "Config file found at ${CONFIG_FILE}"
 
 install_python: upgrade_pyenv
@@ -49,6 +57,10 @@ refresh: delete_venv
 	rm poetry.lock
 	poetry install --no-root
 
+download:
+	HF_HOME='./.cache/huggingface/' \
+	poetry run python ./build/download.py 
+
 # Libraries utilities ----------------------------------------
 
 install:
@@ -73,3 +85,27 @@ size:
 	@du -sh $$(poetry run poetry env info --path 2>/dev/null)
 	@echo "Size of devpi cache"
 	@du -sh $$HOME/.devpi/server ||:
+
+# Container targets ------------------------------------------
+
+# Check if sudo is required to run Docker
+RUNSUDO := $(shell groups | grep ' docker \|com\.apple' 1>/dev/null || echo "sudo")
+
+container-build:
+	@echo "Building container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker build . -f build/containerfile_dev \
+		--build-arg DIR=${DIR} \
+		--build-arg USER_ID="$$(id -u)" \
+		-t ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+	${RUNSUDO} docker image ls ${CONTAINER_IMAGE}:${CONTAINER_TAG}
+
+container-run: config_exists
+	echo "Running container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker run -it \
+		-p 7860:7860 \
+		-v $(shell realpath $$(pwd)/${CONFIG_FILE}):/home/user/$(shell basename $$(pwd))/config/env.txt \
+		${CONTAINER_IMAGE}:${CONTAINER_TAG} bash -c "cd ${DIR} && make run"
+
+container-push:
+	@echo "Pushing container image ${CONTAINER_IMAGE}:${CONTAINER_TAG}"
+	${RUNSUDO} docker push ${CONTAINER_IMAGE}:${CONTAINER_TAG}
