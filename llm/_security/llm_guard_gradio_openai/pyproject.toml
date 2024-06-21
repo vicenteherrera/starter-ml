@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "gradio_openai"
+version = "0.1.0"
+description = ""
+authors = ["Vicente Herrera <vicenteherrera@vicenteherrera.com>"]
+readme = "README.md"
+package-mode = false
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+# [[tool.poetry.source]]
+# name = "devpi"
+# url = "http://127.0.0.1:3141/root/pypi/+simple/"
+# priority = "primary"
+# Disable PyPI and uncomment this to use devpi local library cache
+
+[tool.poetry.dependencies]
+python = "==3.11.7"
+openai = "^1.35.2"
+transformers = "^4.34.0"
+torch = "^2.1.1"
+python-dotenv = "^1.0.0"
+outlines = "^0.0.9"
+accelerate = "^0.24.1"
+gradio = "^4.31.4"
+tensorflow = "^2.16.1"
+llm-guard = "^0.3.13"
+tf-keras = "^2.16.0"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+black = "^23.11.0"
+
+[build-system]
+requires = ["poetry-core>=1.8.3"]
+build-backend = "poetry.core.masonry.api"
