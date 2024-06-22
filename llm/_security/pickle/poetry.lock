@@ -337,6 +337,17 @@ files = [
 ]
 
 [[package]]
+name = "picklescan"
+version = "0.0.16"
+description = "Security scanner detecting Python Pickle files performing suspicious actions"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "picklescan-0.0.16-py3-none-any.whl", hash = "sha256:f6a59594afae4c3117142392eacb6bf45f21b602d34745372c4f181a9f352d13"},
+    {file = "picklescan-0.0.16.tar.gz", hash = "sha256:25cfe271574c8dc1f75136cc9645cfeaf5b98e19a6b598e2a0f506a84778b044"},
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.2.2"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -547,4 +558,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.7"
-content-hash = "637d5a524f0d39c55f20471ef4bbd3f00c8cbb32842101f5590ca0990307a85f"
+content-hash = "b851ec2e1218c53861be58d92f2f4ff2b10f9bd542695d03cb48a3c353f2462b"
