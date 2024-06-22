@@ -69,7 +69,9 @@ run-load-pandas:
 run-load-model:
 	poetry run python ./src/load-model.py
 
-
+run-scan:
+	poetry run picklescan --path data/compromise.bin ||:
+	poetry run picklescan --path data/linear_regression.pkl ||:
 
 # requirements ----------------------------------------------------------------
 
@@ -81,7 +83,7 @@ config_exists:
 	@[ ! -z "${CONFIG_FILE}" ] || ( echo "Error: Config file env.txt not found" && exit 1 )
 	@echo "Config file found at ${CONFIG_FILE}"
 
-install_python: upgrade_pyenv
+install_python:
 	pyenv install $$(cat .python-version) -s
 
 upgrade_pyenv:
