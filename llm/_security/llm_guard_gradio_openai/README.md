@@ -1,7 +1,3 @@
-# gradio_openai
-
-Use OpenAI with custom Gradio chat UI
-
 # llm_guard_openai
 
 Test LLM-Guard mitigations with an AI endpoint.
