@@ -5,6 +5,8 @@ MODEL=gpt2
 MODEL_EXT=*.safetensors
 REVISION=main
 
+OPENAI_MODEL=gpt-4o-mini
+
 DIR=$(shell basename $$(pwd))
 CONTAINER_IMAGE=quay.io/vicenteherrera/python-dev-shell
 CONTAINER_TAG=3.11.7-${DIR}
@@ -22,8 +24,8 @@ help:
 	@echo "# On local open source model ${MODEL} from Huggingface:"
 	@echo "make run-hg"
 	@echo ""
-	@echo "# On OpenAI GPT-3.5-turbo:"
-	@echo "make run-oa-gpt3.5-turbo"
+	@echo "# On OpenAI gpt endpoint"
+	@echo "make run-oa"
 	@echo ""
 
 run-hg: config_exists
@@ -31,10 +33,10 @@ run-hg: config_exists
 	HF_HOME='./.cache/huggingface' \
 	poetry run garak --model_type huggingface --model_name ${MODEL} --probes dan
 
-run-oa-gpt3.5-turbo: config_exists
+run-oa: config_exists
 	source "${CONFIG_FILE}" && \
 	HF_HOME='./.cache/huggingface' \
-	poetry run garak --model_type openai --model_name gpt-3.5-turbo --probes dan
+	poetry run garak --model_type openai --model_name ${OPENAI_MODEL} --probes dan
 
 list-probes:
 	poetry run garak --list_probes

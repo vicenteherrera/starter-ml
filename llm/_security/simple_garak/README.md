@@ -21,8 +21,8 @@ make install_garak
 ## Run "Do Anything Now" tests on local GPT2 model, it will be downloaded locally
 make garak-hg-gpt2
 
-## Run "Do Anything Now" tests on OpenAI gpt3.5-turbo
-make garak-oa-gpt3.5-turb
+## Run "Do Anything Now" tests on OpenAI gpt model
+make garak-oa
 
 
 # Using poetry
@@ -33,6 +33,8 @@ make
 ## Run "Do Anything Now" tests on local GPT2 model, it will be downloaded locally
 make run-hg-gpt2
 
-## Run "Do Anything Now" tests on OpenAI gpt3.5-turbo
-make run-oa-gpt3.5-turbo
+## Run "Do Anything Now" tests on OpenAI gpt model
+make run-oa
 ```
+
+##
